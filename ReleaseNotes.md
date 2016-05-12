@@ -1,3 +1,6 @@
+# Version 1.1.0
+* Public release.
+
 # Version 1.0
 * Complete refactor to improve unit testing.
 * Build unit tests.
