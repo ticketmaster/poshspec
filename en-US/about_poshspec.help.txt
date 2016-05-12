@@ -1,0 +1,22 @@
+TOPIC
+    PoshSpec 1.0.0
+
+SHORT DESCRIPTION
+    A Infrastructure Testing DSL running in Pester.
+
+
+LONG DESCRIPTION
+    A Infrastructure Testing DSL running in Pester. The goal was to expand the Pester DSL to allow the development of 
+    infrastructure validation scripts quickly.
+
+PESTER
+    This module augments the Pester testing framework. You can break up your tests into Describe and Context blocks as 
+    you would with normal tests. PoshSpec helper functions will generate the It and statements and execute the Should 
+    statements as you define.
+    
+    Every entry should have a ScriptBlock defining a Should assertion as you would in any Pester script.
+    
+    Eg.
+    Service w32time { Should Be Running }
+    
+    See the help for individual Functions for more details about syntax and which Pester assertions to use.

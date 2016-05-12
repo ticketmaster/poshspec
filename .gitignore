@@ -1,0 +1,4 @@
+# Don't checkin this output dir
+Release/
+
+.vscode/
