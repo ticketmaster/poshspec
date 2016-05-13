@@ -86,7 +86,7 @@ Properties {
     )
 
     # Name of the repository you wish to publish to. Default repo is the PSGallery.
-    $PublishRepository = 'psget_winsys'
+    $PublishRepository = 'PSGallery'
 
     # Your NuGet API key for the PSGallery.  Leave it as $null and the first time
     # you publish you will be prompted to enter your API key.  The build will
