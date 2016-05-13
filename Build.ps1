@@ -93,7 +93,7 @@ Properties {
     # store the key encrypted in a file, so that on subsequent publishes you
     # will no longer be prompted for the API key.
     $NuGetApiKey = $null
-    $EncryptedApiKeyPath = "$env:LOCALAPPDATA\vscode-powershell\NuGetApiKey.clixml"
+    $EncryptedApiKeyPath = "$env:LOCALAPPDATA\vscode-powershell\PSGalleryApiKey.clixml"
 }
 
 ###############################################################################
