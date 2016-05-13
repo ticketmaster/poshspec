@@ -1,6 +1,6 @@
 ﻿Describe 'Services' {    
-    Service w32time { Should Be Running }
-    Service bits { Should Be Stopped }
+    Service w32time Status { Should Be Running }
+    Service bits Status { Should Be Stopped }
 }
 
 Describe 'Files' {

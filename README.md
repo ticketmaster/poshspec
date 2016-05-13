@@ -4,8 +4,8 @@ An infrastructure testing DSL running in Pester. The goal is to expand the Peste
 ## Example 
 ```powershell
 Describe 'Services' {    
-    Service w32time { Should Be Running }
-    Service bits { Should Be Stopped }
+    Service w32time Status { Should Be Running }
+    Service bits Status { Should Be Stopped }
 }
 
 Describe 'Files' {
@@ -15,7 +15,7 @@ Describe 'Files' {
 
 Describe 'Registry' {
     Registry HKLM:\SOFTWARE\Microsoft\Rpc\ClientProtocols { Should Exist }
-    Registry HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\ "NV Domain" { Should Be mybiz.local  }
+    Registry HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\ "SyncDomainWithMembership" { Should Be 1  }
     Registry 'HKLM:\SOFTWARE\Callahan Auto\' { Should Not Exist }
 }
 
@@ -58,11 +58,7 @@ _Verify a Uri returns a 200 StatusCode and optionally validate RawContent._
 
 _Verify a registry key exists and optionally validate the value of a given property._
 
-`NotRegistry [[-Key] <string>]`
-
-_Verify a registry key does not exist._
-
-`Service [-Name] <string> [-Should] <scriptblock>`
+`Service [-Name] <String> [-Property] <String> [-Should] <ScriptBlock>`
 
 _Verify a service is in a given state. Default is "Running"._
 
