@@ -63,7 +63,13 @@ function Get-PoshspecParam {
         }
         else
         {
-            Write-Output -InputObject $token.Content
+            if ($token.Type -eq 'String') {
+                Write-Output -InputObject ('"' + $token.Content + '"')
+            } else {
+                if ($token.Type -ne 'NewLine') {
+                    Write-Output -InputObject $token.Content
+                }
+            }
         }
     }
     
