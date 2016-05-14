@@ -594,7 +594,7 @@ function DnsHost {
     
     $expression = {Resolve-DnsName -Name $Target -DnsOnly -NoHostsFile -ErrorAction SilentlyContinue}
     
-    $params = Get-PoshspecParam -TestName Interface -TestExpression $expression @PSBoundParameters
+    $params = Get-PoshspecParam -TestName DnsHost -TestExpression $expression @PSBoundParameters
     
     Invoke-PoshspecExpression @params
 }
