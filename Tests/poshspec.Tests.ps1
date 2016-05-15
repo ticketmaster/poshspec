@@ -173,7 +173,94 @@ Describe 'Test Functions' {
             It "Should return the correct test Expression" {
                 $results.Expression | Should Be "Get-CimInstance -ClassName 'MSFT_DSCConfigurationStatus' -Namespace 'root/Microsoft/Windows/DesiredStateConfiguration' | Select-Object -ExpandProperty 'Error' | Should BeNullOrEmpty"
             }
-        }   
+        } 
+        
+        Context 'Package' {
+            
+            $results = Package 'Microsoft Visual Studio Code' { Should Not BeNullOrEmpty }
+            
+            It 'Should return a correct test name' {
+                $results.Name | Should Be "Package 'Microsoft Visual Studio Code' Should Not BeNullOrEmpty"
+            }
+            
+            It 'Should return a correct text expression' {
+                $results.Expression | Should Be "Get-Package -Name 'Microsoft Visual Studio Code' -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty"
+            }
+        }
+        
+        Context 'Package w/ properties' {
+            
+            $results = Package 'Microsoft Visual Studio Code' version { Should be '1.1.0' }
+            
+            It 'Should return a correct test name' {
+                $results.Name | Should Be "Package property 'version' for 'Microsoft Visual Studio Code' Should be '1.1.0'"
+            }
+            
+            It 'Should return a correct text expression' {
+                $results.Expression | Should Be "Get-Package -Name 'Microsoft Visual Studio Code' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'version' | Should be '1.1.0'"
+            }
+        }
+        
+        Context 'LocalGroup' {
+            
+            $results = LocalGroup 'Administrators' { Should Not BeNullOrEmpty }
+            
+            It 'Should return a correct test name' {
+                $results.Name | Should Be "LocalGroup 'Administrators' Should Not BeNullOrEmpty"
+            }
+            
+            It 'Should return a correct text expression' {
+                $results.Expression | Should Be 'Get-CimInstance -ClassName Win32_Group -Filter "Name = ''$Target''" | Should Not BeNullOrEmpty'
+            }
+        }
+        
+        Context 'Interface' {
+            $results = Interface ethernet0 { Should Not BeNullOrEmpty }
+            
+            It 'Should return a correct test name' {
+                $results.Name | Should Be "Interface 'ethernet0' Should Not BeNullOrEmpty"
+            }
+            
+            It 'Should return a correct text expression' {
+                $results.Expression | Should Be "Get-NetAdapter -Name 'ethernet0' -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty"
+            }
+        }
+        
+        Context 'Interface w/ properties' {
+            $results = interface ethernet0 status { should be 'up' }
+            
+            It 'Should return a correct test name' {
+                $results.Name | Should Be "Interface property 'status' for 'ethernet0' should be 'up'"
+            }
+            
+            It 'Should return a correct text expression' {
+                $results.Expression | Should Be "Get-NetAdapter -Name 'ethernet0' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'status' | Should Be 'up'"
+            }
+        }
+        
+        Context 'Folder' {
+            $results = Folder $env:ProgramData { should exist }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "Folder 'C:\ProgramData' Should Exist"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "'C:\ProgramData' | Should Exist"
+            }
+        }
+        
+        Context 'Dnshost' {
+            $results = DnsHost www.google.com { should not BeNullOrEmpty }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "DnsHost 'www.google.com' Should Not BeNullOrEmpty"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Resolve-DnsName -Name 'www.google.com' -DnsOnly -NoHostsFile -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty"
+            }
+        }
     }
 }
 
