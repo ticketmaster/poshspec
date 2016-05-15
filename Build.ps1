@@ -64,8 +64,9 @@
 # Customize these properties for your module.
 ###############################################################################
 Properties {
+    $ManifestPath = (Get-Item $PSScriptRoot\*.psd1)[0]
     # The name of your module should match the basename of the PSD1 file.
-    $ModuleName = (Get-Item $PSScriptRoot\*.psd1)[0].BaseName
+    $ModuleName = $ManifestPath.BaseName
 
     # Path to the release notes file.  Set to $null if the release notes reside in the manifest file.
     $ReleaseNotesPath = "$PSScriptRoot\ReleaseNotes.md"
@@ -82,6 +83,7 @@ Properties {
         '.git*',
         '.vscode',
         '*.png',
+        'poshspecdemo.ps1',
         (Split-Path $PSCommandPath -Leaf)
     )
 
@@ -141,6 +143,15 @@ Task Test -depends Build {
 }
 
 Task Build -depends Clean -requiredVariables PublishDir, Exclude, ModuleName {
+    if ((Get-Command -Name Step-ModuleVersion).Source)
+    {
+        Step-ModuleVersion -Path $ManifestPath
+    }
+    else 
+    {
+        Write-Warning "'Step-ModuleVersion' command is not available."    
+    }
+    
     Copy-Item $PSScriptRoot\* -Destination $PublishDir -Recurse -Exclude $Exclude
 
     # Get contents of the ReleaseNotes file and update the copied module manifest file

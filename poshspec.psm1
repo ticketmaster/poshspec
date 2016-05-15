@@ -63,7 +63,13 @@ function Get-PoshspecParam {
         }
         else
         {
-            Write-Output -InputObject $token.Content
+            if ($token.Type -eq 'String') {
+                Write-Output -InputObject ('"' + $token.Content + '"')
+            } else {
+                if ($token.Type -ne 'NewLine') {
+                    Write-Output -InputObject $token.Content
+                }
+            }
         }
     }
     
@@ -403,4 +409,192 @@ function CimObject {
     $params = Get-PoshspecParam -TestName CimObject -TestExpression $expression @PSBoundParameters
     
     Invoke-PoshspecExpression @params 
+}
+
+<#
+.SYNOPSIS
+    Test for installed package.
+.DESCRIPTION
+    Test that a specified package is installed.
+.PARAMETER Target
+    Specifies the Display Name of the package to search for.
+.PARAMETER Property
+    Specifies an optional property to test for on the package. 
+.PARAMETER Should 
+    A Script Block defining a Pester Assertion.
+.EXAMPLE
+    package 'Microsoft Visual Studio Code' { should not BeNullOrEmpty }
+.EXAMPLE
+    package 'Microsoft Visual Studio Code' version { should be '1.1.0' }
+.EXAMPLE
+    package 'NonExistentPackage' { should BeNullOrEmpty } 
+.NOTES
+    Assertions: Be, BeNullOrEmpty
+#>
+function Package {
+    [CmdletBinding(DefaultParameterSetName="Default")]
+    param(
+        [Parameter(Mandatory, Position=1,ParameterSetName="Default")]
+        [Parameter(Mandatory, Position=1,ParameterSetName="Property")]
+        [Alias('Name')]
+        [string]$Target,
+        
+        [Parameter(Position=2,ParameterSetName="Property")]
+        [string]$Property,
+        
+        [Parameter(Mandatory, Position=2,ParameterSetName="Default")]
+        [Parameter(Mandatory, Position=3,ParameterSetName="Property")]
+        [scriptblock]$Should
+    )
+       
+    $expression = {Get-Package -Name $Target -ErrorAction SilentlyContinue}
+    
+    $params = Get-PoshspecParam -TestName Package -TestExpression $expression @PSBoundParameters
+    
+    Invoke-PoshspecExpression @params
+}
+
+<#
+.SYNOPSIS
+    Test if a local group exists.
+.DESCRIPTION
+    Test if a local group exists.
+.PARAMETER Id
+    The local group name to test for. Eg 'Administrators'
+.PARAMETER Should 
+    A Script Block defining a Pester Assertion.  
+.EXAMPLE
+    LocalGroup 'Administrators' { should not BeNullOrEmpty }    
+.EXAMPLE
+    LocalGroup 'BadGroup' { should BeNullOrEmpty }
+.NOTES
+    Assertions: BeNullOrEmpty
+#>
+function LocalGroup {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position=1)]
+        [Alias('Name')]
+        [string]$Target,
+        
+        [Parameter(Mandatory, Position=2)]
+        [scriptblock]$Should
+    )
+    
+    $expression = {Get-CimInstance -ClassName Win32_Group -Filter "Name = '$Target'"}
+    
+    $params = Get-PoshspecParam -TestName LocalGroup -TestExpression $expression @PSBoundParameters
+    
+    Invoke-PoshspecExpression @params
+}
+
+<#
+.SYNOPSIS
+    Test a local network interface.
+.DESCRIPTION
+    Test a local network interface and optionally and specific property.
+.PARAMETER Target
+    Specifies the name of the network adapter to search for.
+.PARAMETER Property
+    Specifies an optional property to test for on the adapter. 
+.PARAMETER Should 
+    A Script Block defining a Pester Assertion.
+.EXAMPLE
+    interface ethernet0 { should not BeNullOrEmpty }
+.EXAMPLE
+    interface ethernet0 status { should be 'up' }
+.EXAMPLE
+    Interface Ethernet0 linkspeed { should be '1 gbps' } 
+.EXAMPLE
+    Interface Ethernet0 macaddress { should be '00-0C-29-F2-69-DD' }
+.NOTES
+    Assertions: Be, BeNullOrEmpty
+#>
+function Interface {
+    [CmdletBinding(DefaultParameterSetName="Default")]
+    param(
+        [Parameter(Mandatory, Position=1,ParameterSetName="Default")]
+        [Parameter(Mandatory, Position=1,ParameterSetName="Property")]
+        [Alias('Name')]
+        [string]$Target,
+        
+        [Parameter(Position=2,ParameterSetName="Property")]
+        [string]$Property,
+        
+        [Parameter(Mandatory, Position=2,ParameterSetName="Default")]
+        [Parameter(Mandatory, Position=3,ParameterSetName="Property")]
+        [scriptblock]$Should
+    )
+    
+    $expression = {Get-NetAdapter -Name $Target -ErrorAction SilentlyContinue}
+
+    $params = Get-PoshspecParam -TestName Interface -TestExpression $expression @PSBoundParameters
+    
+    Invoke-PoshspecExpression @params
+}
+
+<#
+.SYNOPSIS
+    Test if a folder exists.
+.DESCRIPTION
+    Test if a folder exists.
+.PARAMETER Target
+    The path of the folder to search for.
+.PARAMETER Should 
+    A Script Block defining a Pester Assertion.  
+.EXAMPLE
+    folder $env:ProgramData { should exist }        
+.EXAMPLE
+    folder C:\badfolder { should not exist }
+.NOTES
+    Assertions: exist
+#>
+function Folder {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position=1)]
+        [Alias('Path')]
+        [string]$Target,
+        
+        [Parameter(Mandatory, Position=2)]
+        [scriptblock]$Should
+    )
+    
+    $params = Get-PoshspecParam -TestName Folder -TestExpression {$Target} @PSBoundParameters
+    
+    Invoke-PoshspecExpression @params
+}
+
+<#
+.SYNOPSIS
+    Test DNS resolution to a host.
+.DESCRIPTION
+    Test DNS resolution to a host.
+.PARAMETER Target
+    The hostname to resolve in DNS.
+.PARAMETER Should 
+    A Script Block defining a Pester Assertion.  
+.EXAMPLE           
+    dnshost nonexistenthost.mymadeupdomain.tld { should be $null }        
+.EXAMPLE
+    dnshost www.google.com { should not be $null }
+.NOTES
+    Assertions: be
+#>
+function DnsHost {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position=1)]
+        [Alias('Name')]
+        [string]$Target,
+        
+        [Parameter(Mandatory, Position=2)]
+        [scriptblock]$Should
+    )
+    
+    $expression = {Resolve-DnsName -Name $Target -DnsOnly -NoHostsFile -ErrorAction SilentlyContinue}
+    
+    $params = Get-PoshspecParam -TestName DnsHost -TestExpression $expression @PSBoundParameters
+    
+    Invoke-PoshspecExpression @params
 }
