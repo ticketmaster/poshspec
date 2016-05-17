@@ -35,17 +35,31 @@ function Get-PoshspecParam {
     )
     
     $assertion = $Should.ToString().Trim()
-
-    
-    $targetName = $Target
-
-    if ($PSBoundParameters.ContainsKey("FriendlyName"))
+<#
+    if ($PSBoundParameters.ContainsKey("Target"))
     {
-        $targetName = $Friendlyname
+        $Target = '`"' + $Target + '`"'
+    }
+   
+    if ($PSBoundParameters.ContainsKey("Property"))
+    {
+        $Property = "'" + $Property + "'"
     }
     
-    $tokens = [System.Management.Automation.PSParser]::Tokenize($TestExpression,[ref]$null)
+    if ($PSBoundParameters.ContainsKey("Qualifier"))
+    {
+        $Qualifier = "'" + $Qualifier + "'"
+    }    
     
+    #$targetName = $Target
+  #>  
+    if (-not $PSBoundParameters.ContainsKey("FriendlyName"))
+    {
+        $FriendlyName = $Target
+    }
+ 
+    $expressionString = $TestExpression.ToString()
+    <#
     $expandedTokens = foreach ($token in $tokens)
     {
         if ($token.Type -eq 'Variable')
@@ -74,25 +88,27 @@ function Get-PoshspecParam {
     }
     
     $expressionString = $expandedTokens -join " "
-    
+    #>
     if ($PSBoundParameters.ContainsKey("Property"))
     {
         $expressionString += " | Select-Object -ExpandProperty '$Property'"
         
         if ($PSBoundParameters.ContainsKey("Qualifier"))
         {
-            $nameString = "{0} property '{1}' for '{2}' at '{3}' {4}" -f $TestName,$Property, $targetName, $Qualifier, $assertion
+            $nameString = "{0} property '{1}' for '{2}' at '{3}' {4}" -f $TestName,$Property, $FriendlyName, $Qualifier, $assertion
         }
         else 
         {
-            $nameString = "{0} property '{1}' for '{2}' {3}" -f $TestName, $Property, $targetName, $assertion            
+            $nameString = "{0} property '{1}' for '{2}' {3}" -f $TestName, $Property, $FriendlyName, $assertion            
         }        
     }
     else 
     {
-        $nameString = "{0} '{1}' {2}" -f $TestName, $targetName, $assertion
+        $nameString = "{0} '{1}' {2}" -f $TestName, $FriendlyName, $assertion
     }
-        
+
+    $expressionString = $ExecutionContext.InvokeCommand.ExpandString($expressionString)
+    
     $expressionString += " | $assertion"
     
     Write-Output -InputObject ([PSCustomObject]@{Name = $nameString; Expression = $expressionString})
@@ -143,7 +159,7 @@ function Service {
         [scriptblock]$Should
     )
     
-    $params = Get-PoshspecParam -TestName Service -TestExpression {Get-Service -Name $Target} @PSBoundParameters
+    $params = Get-PoshspecParam -TestName Service -TestExpression {Get-Service -Name '$Target'} @PSBoundParameters
     
     Invoke-PoshspecExpression @params
 }
@@ -176,7 +192,7 @@ function File {
     )
     
     $name = Split-Path -Path $Target -Leaf
-    $params = Get-PoshspecParam -TestName File -TestExpression {$Target} -FriendlyName $name @PSBoundParameters
+    $params = Get-PoshspecParam -TestName File -TestExpression {'$Target'} -FriendlyName $name @PSBoundParameters
     
     Invoke-PoshspecExpression @params
 }
@@ -221,11 +237,11 @@ function Registry {
     
     if ($PSBoundParameters.ContainsKey("Property"))
     {
-        $expression = {Get-ItemProperty -Path $Target}
+        $expression = {Get-ItemProperty -Path '$Target'}
     }
     else 
     {
-        $expression = {$Target}
+        $expression = {'$Target'}
     }
     
     $params = Get-PoshspecParam -TestName Registry -TestExpression $expression -FriendlyName $name @PSBoundParameters
@@ -268,7 +284,7 @@ function Http {
         [scriptblock]$Should
     )    
     
-    $params = Get-PoshspecParam -TestName Http -TestExpression {Invoke-WebRequest -Uri $Target -ErrorAction SilentlyContinue} @PSBoundParameters
+    $params = Get-PoshspecParam -TestName Http -TestExpression {Invoke-WebRequest -Uri '$Target' -ErrorAction SilentlyContinue} @PSBoundParameters
     
     Invoke-PoshspecExpression @params
 }
@@ -447,7 +463,7 @@ function Package {
         [scriptblock]$Should
     )
        
-    $expression = {Get-Package -Name $Target -ErrorAction SilentlyContinue}
+    $expression = {Get-Package -Name '$Target' -ErrorAction SilentlyContinue}
     
     $params = Get-PoshspecParam -TestName Package -TestExpression $expression @PSBoundParameters
     
@@ -526,7 +542,7 @@ function Interface {
         [scriptblock]$Should
     )
     
-    $expression = {Get-NetAdapter -Name $Target -ErrorAction SilentlyContinue}
+    $expression = {Get-NetAdapter -Name '$Target' -ErrorAction SilentlyContinue}
 
     $params = Get-PoshspecParam -TestName Interface -TestExpression $expression @PSBoundParameters
     
@@ -560,7 +576,7 @@ function Folder {
         [scriptblock]$Should
     )
     
-    $params = Get-PoshspecParam -TestName Folder -TestExpression {$Target} @PSBoundParameters
+    $params = Get-PoshspecParam -TestName Folder -TestExpression {'$Target'} @PSBoundParameters
     
     Invoke-PoshspecExpression @params
 }

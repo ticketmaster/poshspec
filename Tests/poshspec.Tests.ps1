@@ -11,7 +11,7 @@ Describe 'Module Manifest Tests' {
 Describe 'Get-PoshspecParam' {
     InModuleScope PoshSpec {
         Context 'One Parameter' {
-            $results = Get-PoshspecParam -TestName MyTest -TestExpression {Get-Item $Target} -Target Name -Should { Should Exist }
+            $results = Get-PoshspecParam -TestName MyTest -TestExpression {Get-Item '$Target'} -Target Name -Should { Should Exist }
 
             It "Should return the correct test Name" {
                 $results.Name | Should Be "MyTest 'Name' Should Exist"
@@ -22,8 +22,20 @@ Describe 'Get-PoshspecParam' {
             }            
         }
         
+        Context 'One Parameter with a space' {
+            $results = Get-PoshspecParam -TestName MyTest -TestExpression {Get-Item '$Target'} -Target "Spaced Value" -Should { Should Exist }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "MyTest 'Spaced Value' Should Exist"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-Item 'Spaced Value' | Should Exist"
+            }            
+        }        
+        
         Context 'Two Parameters' {
-            $results = Get-PoshspecParam -TestName MyTest -TestExpression {Get-Item $Target $Property} -Target Name -Property Something -Should { Should Exist }
+            $results = Get-PoshspecParam -TestName MyTest -TestExpression {Get-Item '$Target' '$Property'} -Target Name -Property Something -Should { Should Exist }
 
             It "Should return the correct test Name" {
                 $results.Name | Should Be "MyTest property 'Something' for 'Name' Should Exist"
@@ -35,7 +47,7 @@ Describe 'Get-PoshspecParam' {
         }
         
         Context 'Three Parameters' {
-            $results = Get-PoshspecParam -TestName MyTest -TestExpression {Get-Item $Target $Property $Qualifier} -Target Name -Property Something -Qualifier 1 -Should { Should Exist }
+            $results = Get-PoshspecParam -TestName MyTest -TestExpression {Get-Item '$Target' '$Property' '$Qualifier'} -Target Name -Property Something -Qualifier 1 -Should { Should Exist }
 
             It "Should return the correct test Name" {
                 $results.Name | Should Be "MyTest property 'Something' for 'Name' at '1' Should Exist"
@@ -45,13 +57,6 @@ Describe 'Get-PoshspecParam' {
                 $results.Expression | Should Be "Get-Item 'name' 'Something' '1' | Select-Object -ExpandProperty 'Something' | Should Exist"
             }            
         }        
-        
-        Context 'Expression handling' {
-            
-            It "Should thow and error if missing a property" {
-                { Get-PoshspecParam -TestName MyTest -TestExpression {Get-Item $Target $Property} -Target Name -Should { Should Exist } } | Should Throw
-            }
-        }
     }    
 }
 
@@ -133,7 +138,7 @@ Describe 'Test Functions' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Test-NetConnection -ComputerName 'localhost' -Port '80' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'PingSucceeded' | Should Be `$true"
+                $results.Expression | Should Be "Test-NetConnection -ComputerName localhost -Port 80 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'PingSucceeded' | Should Be `$true"
             }            
         } 
         
@@ -146,7 +151,7 @@ Describe 'Test Functions' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-HotFix -Id 'KB1234567' -ErrorAction SilentlyContinue | Should Exist"
+                $results.Expression | Should Be "Get-HotFix -Id KB1234567 -ErrorAction SilentlyContinue | Should Exist"
             }
         }
         
@@ -159,7 +164,7 @@ Describe 'Test Functions' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-CimInstance -ClassName 'Win32_OperatingSystem' | Select-Object -ExpandProperty 'SystemDirectory' | Should Be C:\WINDOWS\system32"
+                $results.Expression | Should Be "Get-CimInstance -ClassName Win32_OperatingSystem | Select-Object -ExpandProperty 'SystemDirectory' | Should Be C:\WINDOWS\system32"
             }
         }        
         Context 'CimObject with Namespace' {
@@ -171,7 +176,7 @@ Describe 'Test Functions' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-CimInstance -ClassName 'MSFT_DSCConfigurationStatus' -Namespace 'root/Microsoft/Windows/DesiredStateConfiguration' | Select-Object -ExpandProperty 'Error' | Should BeNullOrEmpty"
+                $results.Expression | Should Be "Get-CimInstance -ClassName MSFT_DSCConfigurationStatus -Namespace root/Microsoft/Windows/DesiredStateConfiguration | Select-Object -ExpandProperty 'Error' | Should BeNullOrEmpty"
             }
         } 
         
@@ -210,7 +215,7 @@ Describe 'Test Functions' {
             }
             
             It 'Should return a correct text expression' {
-                $results.Expression | Should Be 'Get-CimInstance -ClassName Win32_Group -Filter "Name = ''$Target''" | Should Not BeNullOrEmpty'
+                $results.Expression | Should Be 'Get-CimInstance -ClassName Win32_Group -Filter "Name = ''Administrators''" | Should Not BeNullOrEmpty'
             }
         }
         
@@ -258,7 +263,7 @@ Describe 'Test Functions' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Resolve-DnsName -Name 'www.google.com' -DnsOnly -NoHostsFile -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty"
+                $results.Expression | Should Be "Resolve-DnsName -Name www.google.com -DnsOnly -NoHostsFile -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty"
             }
         }
     }
