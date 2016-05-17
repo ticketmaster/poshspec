@@ -1,3 +1,11 @@
+# Version 1.2.2
+* Merged PR including 5 new functions
+  * Package
+  * LocalGroup
+  * Interface
+  * Folder
+  * DnsHost
+
 # Version 1.1.0
 * Public release.
 
