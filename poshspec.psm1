@@ -35,60 +35,14 @@ function Get-PoshspecParam {
     )
     
     $assertion = $Should.ToString().Trim()
-<#
-    if ($PSBoundParameters.ContainsKey("Target"))
-    {
-        $Target = '`"' + $Target + '`"'
-    }
-   
-    if ($PSBoundParameters.ContainsKey("Property"))
-    {
-        $Property = "'" + $Property + "'"
-    }
-    
-    if ($PSBoundParameters.ContainsKey("Qualifier"))
-    {
-        $Qualifier = "'" + $Qualifier + "'"
-    }    
-    
-    #$targetName = $Target
-  #>  
+
     if (-not $PSBoundParameters.ContainsKey("FriendlyName"))
     {
         $FriendlyName = $Target
     }
  
     $expressionString = $TestExpression.ToString()
-    <#
-    $expandedTokens = foreach ($token in $tokens)
-    {
-        if ($token.Type -eq 'Variable')
-        {
-            $variable = Get-Variable $token.Content -ErrorAction SilentlyContinue
-            if (-not [string]::IsNullOrEmpty($variable.Value))
-            {
-                $value = "'" + $variable.Value + "'"
-                Write-Output -InputObject $value
-            }
-            else
-            {
-                Throw "Could not find a variable in scope by the name '$($token.Content)'"
-            }
-        }
-        else
-        {
-            if ($token.Type -eq 'String') {
-                Write-Output -InputObject ('"' + $token.Content + '"')
-            } else {
-                if ($token.Type -ne 'NewLine') {
-                    Write-Output -InputObject $token.Content
-                }
-            }
-        }
-    }
-    
-    $expressionString = $expandedTokens -join " "
-    #>
+
     if ($PSBoundParameters.ContainsKey("Property"))
     {
         $expressionString += " | Select-Object -ExpandProperty '$Property'"
