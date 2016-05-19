@@ -1,3 +1,13 @@
+# Version 1.3.0
+* Added Functions for 
+  * WebSiteState
+  * AppPoolState
+  * SiteSSLFlag
+  * CheckSite
+  * CheckAppPool
+  * WebSiteBinding
+ 
+  
 # Version 1.2.2
 * Merged PR including 5 new functions
   * Package

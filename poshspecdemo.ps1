@@ -29,3 +29,12 @@ Describe 'CimObject' {
     CimObject Win32_OperatingSystem SystemDirectory { Should Be C:\WINDOWS\system32 }
     CimObject root/StandardCimv2/MSFT_NetOffloadGlobalSetting ReceiveSideScaling { Should Be Enabled }
 }
+
+Describe 'WebSite' {
+    WebSiteState TestSite { Should be Started }
+    AppPoolState TestSite { Should be Started }
+    SiteSSLFlag  TestSite { Should be 0}
+    CheckSite  TestSite { Should be $True}
+    CheckAppPool TestSite {Should be $True}
+    WebSiteBinding TestSite {Should Match '80'}
+}

@@ -568,3 +568,197 @@ function DnsHost {
     
     Invoke-PoshspecExpression @params
 }
+
+<#
+.SYNOPSIS
+    Test State of Application Pool
+.DESCRIPTION
+    Used To Determine if Application Pool is Running
+.PARAMETER Target
+    The name of the App Pool to be Tested
+.PARAMETER Should 
+    A Script Block defining a Pester Assertion.  
+.EXAMPLE           
+    AppPoolState TestSite { Should be Started }   
+.NOTES
+    Assertions: be
+#>
+function AppPoolState {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position=1)]
+        [Alias('Name')]
+        [string]$Target,
+        
+        [Parameter(Mandatory, Position=2)]
+        [scriptblock]$Should
+    )
+    
+    $expression = {Get-WebAppPoolState -Name '$Target' -ErrorAction SilentlyContinue}
+    
+    $params = Get-PoshspecParam -TestName AppPoolState -Property "Value" -TestExpression $expression @PSBoundParameters
+    
+    Invoke-PoshspecExpression @params
+}
+
+<#
+.SYNOPSIS
+    Test State of Web Site
+.DESCRIPTION
+    Used To Determine if Website is Running
+.PARAMETER Target
+    The name of the Web Site to be Tested
+.PARAMETER Should 
+    A Script Block defining a Pester Assertion.  
+.EXAMPLE           
+     WebSiteState TestSite { Should be Started } 
+.NOTES
+    Assertions: be
+#>
+function WebSiteState {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position=1)]
+        [Alias('Name')]
+        [string]$Target,
+        
+        [Parameter(Mandatory, Position=2)]
+        [scriptblock]$Should
+    )
+    
+    $expression = {Get-WebSiteState -Name '$Target' -ErrorAction SilentlyContinue}
+    
+    $params = Get-PoshspecParam -TestName WebSiteState -Property "Value" -TestExpression $expression @PSBoundParameters
+    
+    Invoke-PoshspecExpression @params
+}
+
+<#
+.SYNOPSIS
+    Test Binding of Web Site
+.DESCRIPTION
+    Used To Determine if Website is Running Desired Binding
+.PARAMETER Target
+    The name of the Web Site to be Tested
+.PARAMETER Should 
+    A Script Block defining a Pester Assertion.  
+.EXAMPLE           
+     WebSiteBinding TestSite {Should Match '80'} 
+.NOTES
+    Assertions: Match
+#>
+function WebSiteBinding {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position=1)]
+        [Alias('Name')]
+        [string]$Target,
+        
+        [Parameter(Mandatory, Position=2)]
+        [scriptblock]$Should
+    )
+    
+    $expression = {Get-WebBinding -Name '$Target' -ErrorAction SilentlyContinue }
+    
+    $params = Get-PoshspecParam -TestName WebSiteBinding -Property "BindingInformation" -TestExpression $expression @PSBoundParameters
+    
+    Invoke-PoshspecExpression @params
+}
+
+<#
+.SYNOPSIS
+    Check if Site Using SSL Binding
+.DESCRIPTION
+    Used To Determine if Website has SSL Binding
+.PARAMETER Target
+    The name of the Web Site to be Tested
+.PARAMETER Should 
+    A Script Block defining a Pester Assertion.  
+.EXAMPLE           
+     CheckSite  TestSite { Should be $True}
+.NOTES
+    Assertions: be
+#>
+function SiteSSLFlag {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position=1)]
+        [Alias('Name')]
+        [string]$Target,
+        
+        [Parameter(Mandatory, Position=2)]
+        [scriptblock]$Should
+    )
+    
+    $expression = {Get-WebBinding -Name '$Target' -ErrorAction SilentlyContinue}
+    
+    $params = Get-PoshspecParam -TestName SiteSSLFlag -Property "sslFlags" -TestExpression $expression @PSBoundParameters
+    
+    Invoke-PoshspecExpression @params
+}
+
+<#
+.SYNOPSIS
+    Check if Site Exists
+.DESCRIPTION
+    Used To Determine if Website Exists
+.PARAMETER Target
+    The name of the Web Site to be Tested
+.PARAMETER Should 
+    A Script Block defining a Pester Assertion.  
+.EXAMPLE           
+     CheckSite  TestSite { Should be $True}
+.NOTES
+    #REQUIRES# webadministration module
+    Assertions: be
+#>
+function CheckSite {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position=1)]
+        [Alias('Name')]
+        [string]$Target,
+        
+        [Parameter(Mandatory, Position=2)]
+        [scriptblock]$Should
+    )
+    
+    $expression = {Test-Path -Path "IIS:\Sites\$Target" -ErrorAction SilentlyContinue}
+    
+    $params = Get-PoshspecParam -TestName CheckSite -TestExpression $expression @PSBoundParameters
+    
+    Invoke-PoshspecExpression @params
+}
+
+<#
+.SYNOPSIS
+    Check if AppPool Exists
+.DESCRIPTION
+    Used To Determine if Website Exists
+.PARAMETER Target
+    The name of the App Pool to be Tested
+.PARAMETER Should 
+    A Script Block defining a Pester Assertion.  
+.EXAMPLE           
+     CheckAppPool TestSite { Should be $True}
+.NOTES
+    #REQUIRES# webadministration module
+    Assertions: be
+#>
+function CheckAppPool {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position=1)]
+        [Alias('Name')]
+        [string]$Target,
+        
+        [Parameter(Mandatory, Position=2)]
+        [scriptblock]$Should
+    )
+    
+    $expression = {Test-Path -Path "IIS:\AppPools\$Target" -ErrorAction SilentlyContinue}
+    
+    $params = Get-PoshspecParam -TestName CheckAppPool -TestExpression $expression @PSBoundParameters
+    
+    Invoke-PoshspecExpression @params
+}
