@@ -40,12 +40,13 @@ Describe 'CimObject' {
     CimObject root/StandardCimv2/MSFT_NetOffloadGlobalSetting ReceiveSideScaling { Should Be Enabled }
 }
 Describe 'WebSite' {
-    WebSiteState TestSite { Should be Started }
-    AppPoolState TestSite { Should be Started }
-    SiteSSLFlag  TestSite { Should be 0}
-    CheckSite  TestSite { Should be $True}
-    CheckAppPool TestSite {Should be $True}
-    WebSiteBinding TestSite {Should Match '80'}
+   WebSite TestSite protocol { Should be "http" }
+   WebSite TestSite bindingInformation { Should match '80' }
+   WebSite TestSite sslFlags { Should be 0 }
+   WebSite TestSite state { Should be 'Started' }
+   Website TestSite physicalPath { Should be 'C:\IIS\Files\TestSite' } 
+   CheckAppPool TestSite { Should be $True}
+   AppPoolState TestSite { Should be Started } 
 }
 ```
 
