@@ -36,6 +36,6 @@ Describe 'WebSite' {
    WebSite TestSite sslFlags { Should be 0 }
    WebSite TestSite state { Should be 'Started' }
    Website TestSite physicalPath { Should be 'C:\IIS\Files\TestSite' } 
-   CheckAppPool TestSite { Should be $True}
+   CheckAppPool TestSite { Should be $True }
    AppPoolState TestSite { Should be Started }   
 }

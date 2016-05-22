@@ -32,46 +32,32 @@
         [Parameter(Position=2)]
         [ValidateSet("sslFlags","protocol","bindingInformation","state","physicalPath")]
         [string]$Property,
-        
+
         [Parameter(Mandatory, Position=3)]
         [scriptblock]$Should
     )
     
+    $expression = {}
+    
     switch ($Property){
         protocol{
             $expression = {Get-WebBinding -Name '$Target' -ErrorAction SilentlyContinue }
-            $params = Get-PoshspecParam -TestName WebSite -TestExpression $expression @PSBoundParameters
-                
-            Invoke-PoshspecExpression @params 
         }
         state{
             $expression = {Get-WebSite -Name '$Target' -ErrorAction SilentlyContinue }
-            
-            $params = Get-PoshspecParam -TestName WebSite -TestExpression $expression @PSBoundParameters
-            
-            Invoke-PoshspecExpression @params
         }
         bindingInformation{
             $expression = {Get-WebBinding -Name '$Target' -ErrorAction SilentlyContinue }
-            
-            $params = Get-PoshspecParam -TestName WebSite -TestExpression $expression @PSBoundParameters
-            
-            Invoke-PoshspecExpression @params
         }
         physicalPath{
             $expression = {Get-WebSite -Name '$Target' -ErrorAction SilentlyContinue }
-            
-            $params = Get-PoshspecParam -TestName WebSite -TestExpression $expression @PSBoundParameters
-            
-            Invoke-PoshspecExpression @params
         }
         sslFlags{
             $expression = {Get-WebBinding -Name '$Target' -ErrorAction SilentlyContinue }
+        }      
+    }
             
             $params = Get-PoshspecParam -TestName WebSite -TestExpression $expression @PSBoundParameters
             
             Invoke-PoshspecExpression @params
-        }      
-    }
-
 }
