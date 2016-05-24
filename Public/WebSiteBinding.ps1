@@ -1,20 +1,22 @@
 <#
 .SYNOPSIS
-    WebSite Settings
+    WebSiteBinding Settings
 .DESCRIPTION
     Used To Determine if Website is Running Desired Settings
 .PARAMETER Target
     The name of the Web Site to be Tested
+.PARAMETER Qualifier
+ The  qualifier to be used to further specify the test [http or https]
 .PARAMETER Property
     The name of the Property of the Web Site to be Tested
 .PARAMETER Should 
     A Script Block defining a Pester Assertion.  
 .EXAMPLE           
-   WebSite TestSite protocol { Should be "http" }
+   WebSite TestSite http protocol { Should be "http" }
 .EXAMPLE           
-   WebSite TestSite bindingInformation { Should match '80' }
+   WebSite TestSite https bindingInformation { Should match '443' }
  .EXAMPLE           
-   WebSite TestSite sslFlags { Should be 0 }
+   WebSite TestSite https sslFlags { Should be 1 }
 .NOTES
     Assertions: Match, Be
 #>
