@@ -31,11 +31,12 @@ Describe 'CimObject' {
 }
 
 Describe 'WebSite' {
-   WebSite TestSite protocol { Should be "http" }
-   WebSite TestSite bindingInformation { Should match '80' }
-   WebSite TestSite sslFlags { Should be 0 }
+   WebSiteBinding TestSite http protocol { Should be "http" }
+   WebSiteBinding TestSite http bindingInformation { Should match '80' }
+   WebSiteBinding TestSite http sslFlags { Should be 0 }
    WebSite TestSite state { Should be 'Started' }
-   Website TestSite physicalPath { Should be 'C:\IIS\Files\TestSite' } 
+   WebSite TestSite Name { Should be 'TestSite'} 
+   WebSite TestSite physicalPath { Should be 'C:\IIS\Files\TestSite' } 
    CheckAppPool TestSite { Should be $True }
    AppPoolState TestSite { Should be Started }   
 }

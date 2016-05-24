@@ -10,13 +10,15 @@
 .PARAMETER Should 
     A Script Block defining a Pester Assertion.  
 .EXAMPLE           
-   WebSite TestSite state { Should be 'Started' }
+   WebSite TestSite protocol { Should be "http" }
 .EXAMPLE           
-   Website TestSite physicalPath { Should be 'C:\IIS\Files\index.html' } 
+   WebSite TestSite bindingInformation { Should match '80' }
+ .EXAMPLE           
+   WebSite TestSite sslFlags { Should be 0 }
 .NOTES
     Assertions: Match, Be
 #>
-    function WebSite{
+    function WebSiteBinding{
     [CmdletBinding()]
     param(
         [Parameter(Mandatory, Position=1)]
@@ -24,16 +26,20 @@
         [string]$Target,
         
         [Parameter(Position=2)]
-        [ValidateSet("bindings","name","ID","state","physicalPath")]
+        [ValidateSet("http","https")]
+        [string]$Qualifier,
+        
+        [Parameter(Position=3)]
+        [ValidateSet("sslFlags","protocol","bindingInformation")]
         [string]$Property,
 
-        [Parameter(Mandatory, Position=3)]
+        [Parameter(Mandatory, Position=4)]
         [scriptblock]$Should
     )
     
-            $expression = {Get-WebSite -Name '$Target' -ErrorAction SilentlyContinue }
-            
-            $params = Get-PoshspecParam -TestName WebSite -TestExpression $expression @PSBoundParameters
+            $expression = {Get-WebBinding -Name '$Target' -protocol '$Qualifier' -ErrorAction SilentlyContinue }
+
+            $params = Get-PoshspecParam -TestName WebSiteBinding -TestExpression $expression @PSBoundParameters
             
             Invoke-PoshspecExpression @params
 }
