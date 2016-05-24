@@ -13,6 +13,12 @@
    WebSite TestSite state { Should be 'Started' }
 .EXAMPLE           
    Website TestSite physicalPath { Should be 'C:\IIS\Files\index.html' } 
+.EXAMPLE           
+   Website TestSite binding { Should Match '*:80*' } 
+.EXAMPLE           
+   Website TestSite name { Should be 'testsite' } 
+ .EXAMPLE           
+   Website TestSite ID { Should be 1 }   
 .NOTES
     Assertions: Match, Be
 #>
