@@ -3,7 +3,7 @@
     Test a File.
 .DESCRIPTION
     Test the Existance or Contents of a File..
-.PARAMETER Path
+.PARAMETER Target
     Specifies the path to an item.
 .PARAMETER Should 
     A Script Block defining a Pester Assertion.       

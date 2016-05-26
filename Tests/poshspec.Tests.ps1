@@ -314,7 +314,31 @@ Describe 'Test Functions' {
             }
         }
         
+        Context 'SoftwareProduct' {
+            
+            $results = SoftwareProduct 'Microsoft .NET Framework 4.6.1' { Should Exist }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "SoftwareProduct 'Microsoft .NET Framework 4.6.1' Should Exist"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-ItemProperty -Path hklm:\\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object DisplayName -Match 'Microsoft .NET Framework 4.6.1' | Should Exist"
+            }
+        }
         
+        Context 'SoftwareProduct w/Property' {
+            
+            $results = SoftwareProduct 'Microsoft .NET Framework 4.6.1' DisplayVersion { Should Be 4.6.01055 }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "SoftwareProduct property 'DisplayVersion' for 'Microsoft .NET Framework 4.6.1' Should Be 4.6.01055"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-ItemProperty -Path hklm:\\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object DisplayName -Match 'Microsoft .NET Framework 4.6.1' | Select-Object -ExpandProperty 'DisplayVersion' | Should Be 4.6.01055"
+            }
+        }
     }
 }
 

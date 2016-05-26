@@ -3,7 +3,7 @@
     Test the value of a CimObject Property.
 .DESCRIPTION
     Test the value of a CimObject Property. The Class can be provided with the Namespace. See Example.
-.PARAMETER ClassName
+.PARAMETER Target
     Specifies the name of the CIM class for which to retrieve the CIM instances. Can be just the ClassName
     in the default namespace or in the form of namespace/className to access other namespaces.
 .PARAMETER Property

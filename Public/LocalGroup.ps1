@@ -3,7 +3,7 @@
     Test if a local group exists.
 .DESCRIPTION
     Test if a local group exists.
-.PARAMETER Id
+.PARAMETER Target
     The local group name to test for. Eg 'Administrators'
 .PARAMETER Should 
     A Script Block defining a Pester Assertion.  
