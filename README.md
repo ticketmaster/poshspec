@@ -7,4 +7,4 @@ PS> Install-Module -Name poshspec
 ```
 
 ## Documentation 
-[Wiki](wiki/Introduction)
+[Wiki](/wiki/Introduction)
