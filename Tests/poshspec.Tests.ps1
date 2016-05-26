@@ -265,7 +265,56 @@ Describe 'Test Functions' {
             It "Should return the correct test Expression" {
                 $results.Expression | Should Be "Resolve-DnsName -Name www.google.com -DnsOnly -NoHostsFile -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty"
             }
+        }  
+             
+        Context 'WebSite' {
+            $results =    WebSite TestSite state { Should be 'Started' }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "WebSite property 'state' for 'TestSite' Should be 'Started'"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-WebSite -Name 'TestSite' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'state' | Should be 'Started'"
+            }
+        } 
+              
+        Context 'WebSiteBinding' {
+            $results = WebSiteBinding TestSite http protocol { Should be 'http' }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "WebSiteBinding property 'protocol' for 'TestSite' at 'http' Should be 'http'"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-WebBinding -Name 'TestSite' -protocol 'http' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'protocol' | Should be 'http'"
+            }
+        }             
+        Context 'AppPoolState' {
+            $results = AppPoolState TestSite { Should be 'Started' }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "AppPoolState property 'Value' for 'TestSite' Should be 'Started'"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-WebAppPoolState -Name 'TestSite' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'Value' | Should be 'Started'"
+            }
+        } 
+              
+        Context 'CheckAppPool' {
+            $results = CheckAppPool TestSite { Should be $true }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "CheckAppPool 'TestSite' Should be `$true"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Test-Path -Path `"IIS:\AppPools\TestSite`" -ErrorAction SilentlyContinue | Should be `$true"
+            }
         }
+        
+        
     }
 }
 

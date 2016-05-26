@@ -31,7 +31,7 @@ function Get-PoshspecParam {
         $FriendlyName = $Target
     }
  
-    $expressionString = $TestExpression.ToString()
+    $expressionString = $TestExpression.ToString().Trim()
 
     if ($PSBoundParameters.ContainsKey("Property"))
     {
