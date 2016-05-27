@@ -3,7 +3,7 @@
     Test a Web Service.
 .DESCRIPTION
     Test that a Web Service is reachable and optionally returns specific content.
-.PARAMETER Uri
+.PARAMETER Target
     Specifies the Uniform Resource Identifier (URI) of the Internet resource to which the web request is sent.
 .PARAMETER Property
     Specifies a property of the WebResponseObject object to test. 

@@ -3,7 +3,7 @@
     Test if a Hotfix is installed.
 .DESCRIPTION
     Test if a Hotfix is installed.
-.PARAMETER Id
+.PARAMETER Target
     The Hotfix ID. Eg KB1112233
 .PARAMETER Should 
     A Script Block defining a Pester Assertion.  

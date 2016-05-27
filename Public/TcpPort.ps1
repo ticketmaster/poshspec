@@ -3,9 +3,9 @@
     Test a a Tcp Port.
 .DESCRIPTION
     Test that a Tcp Port is listening and optionally validate any TestNetConnectionResult property.
-.PARAMETER Address
+.PARAMETER Target
     Specifies the Domain Name System (DNS) name or IP address of the target computer.
-.PARAMETER Port
+.PARAMETER Qualifier
     Specifies the TCP port number on the remote computer.
 .PARAMETER Property
     Specifies a property of the TestNetConnectionResult object to test.  

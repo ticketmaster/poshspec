@@ -3,7 +3,7 @@
     Test a Service.
 .DESCRIPTION
     Test the Status of a given Service.
-.PARAMETER Name
+.PARAMETER Target
     Specifies the service names of service.
 .PARAMETER Should 
     A Script Block defining a Pester Assertion.   
