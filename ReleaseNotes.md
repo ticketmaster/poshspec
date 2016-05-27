@@ -1,9 +1,14 @@
-# Version 2.0.0
+# Version 2.1.1
+* Added Functions for 
+  * Firewall
+
+# Version 2.1.0
 * Broke Down PSM1 to Many Different Functions in their own files [No change in functionality]
 * Added Functions for 
   * CheckSite
   * CheckAppPool
   * WebSite
+  * SoftwareProduct 
  
   
 # Version 1.2.2

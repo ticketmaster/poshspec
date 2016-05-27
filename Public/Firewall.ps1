@@ -1,12 +1,12 @@
 <#
 .SYNOPSIS
-    WebSite Settings
+    Firewall Settings
 .DESCRIPTION
-    Used To Determine if Website is Running Desired Settings
+    Used To Determine if Firewall is Running Desired Settings
 .PARAMETER Target
-    The name of the Web Site to be Tested
+    The name of the Firewall DisplayName to be Tested
 .PARAMETER Property
-    The name of the Property of the Web Site to be Tested
+    The name of the Property of the Firewall Object to be Tested
 .PARAMETER Should 
     A Script Block defining a Pester Assertion.  
 .EXAMPLE           
