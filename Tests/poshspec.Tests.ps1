@@ -313,6 +313,19 @@ Describe 'Test Functions' {
                 $results.Expression | Should Be "Test-Path -Path `"IIS:\AppPools\TestSite`" -ErrorAction SilentlyContinue | Should be `$true"
             }
         }
+                      
+        Context 'Firewall' {
+            $results =    Firewall putty.exe Action { Should be 'Allow' }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "Firewall property 'Action' for 'putty.exe' Should be 'Allow'"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-NetFirewallRule -DisplayName 'putty.exe' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'Action' | Should be 'Allow'"
+            }
+        }
+        
         
         Context 'SoftwareProduct' {
             

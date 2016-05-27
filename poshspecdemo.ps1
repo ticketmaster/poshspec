@@ -40,3 +40,10 @@ Describe 'WebSite' {
    CheckAppPool TestSite { Should be $True }
    AppPoolState TestSite { Should be Started }   
 }
+
+Describe 'Firewall' {
+   Firewall putty.exe Enabled { Should be "$True" }
+   Firewall putty.exe Action { Should be 'Allow' }
+   Firewall putty.exe Profile { Should be 'Private' }
+}
+
