@@ -313,6 +313,19 @@ Describe 'Test Functions' {
                 $results.Expression | Should Be "Test-Path -Path `"IIS:\AppPools\TestSite`" -ErrorAction SilentlyContinue | Should be `$true"
             }
         }
+
+        Context 'WebSiteState' {
+            $results = WebSiteState TestSite { Should be 'Started'}
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "WebSiteState property 'value' for 'TestSite' Should be 'Started'"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-WebSiteState -Name 'TestSite' -ErrorAction SilentlyContinue | Select-Object -expandproperty 'Value' | Should be 'Started'"
+            }
+        }
+                      
                       
         Context 'Firewall' {
             $results =    Firewall putty.exe Action { Should be 'Allow' }

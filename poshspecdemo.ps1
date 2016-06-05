@@ -38,7 +38,8 @@ Describe 'WebSite' {
    WebSite TestSite Name { Should be 'TestSite'} 
    WebSite TestSite physicalPath { Should be 'C:\IIS\Files\TestSite' } 
    CheckAppPool TestSite { Should be $True }
-   AppPoolState TestSite { Should be Started }   
+   AppPoolState TestSite { Should be Started } 
+   WebSiteState TestSite { Should be Started }
 }
 
 Describe 'Firewall' {
