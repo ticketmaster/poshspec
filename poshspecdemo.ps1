@@ -29,3 +29,21 @@ Describe 'CimObject' {
     CimObject Win32_OperatingSystem SystemDirectory { Should Be C:\WINDOWS\system32 }
     CimObject root/StandardCimv2/MSFT_NetOffloadGlobalSetting ReceiveSideScaling { Should Be Enabled }
 }
+
+Describe 'WebSite' {
+   WebSiteBinding TestSite http protocol { Should be "http" }
+   WebSiteBinding TestSite http bindingInformation { Should match '80' }
+   WebSiteBinding TestSite http sslFlags { Should be 0 }
+   WebSite TestSite state { Should be 'Started' }
+   WebSite TestSite Name { Should be 'TestSite'} 
+   WebSite TestSite physicalPath { Should be 'C:\IIS\Files\TestSite' } 
+   CheckAppPool TestSite { Should be $True }
+   AppPoolState TestSite { Should be Started }   
+}
+
+Describe 'Firewall' {
+   Firewall putty.exe Enabled { Should be "$True" }
+   Firewall putty.exe Action { Should be 'Allow' }
+   Firewall putty.exe Profile { Should be 'Private' }
+}
+
