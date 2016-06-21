@@ -1,6 +1,9 @@
 # Version 2.1.1
 * Added Functions for 
   * Firewall
+  * WebsiteState
+  * PhysicalDisk
+  * Volume
 
 # Version 2.1.0
 * Broke Down PSM1 to Many Different Functions in their own files [No change in functionality]
