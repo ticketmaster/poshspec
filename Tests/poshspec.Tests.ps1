@@ -365,6 +365,32 @@ Describe 'Test Functions' {
                 $results.Expression | Should Be "Get-ItemProperty -Path hklm:\\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object DisplayName -Match 'Microsoft .NET Framework 4.6.1' | Select-Object -ExpandProperty 'DisplayVersion' | Should Be 4.6.01055"
             }
         }
+        
+        Context 'Volume' {
+            
+            $results = Volume C HealthStatus { Should be 'Healthy' }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "Volume property 'HealthStatus' for 'C' Should be 'Healthy'"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-Volume -DriveLetter 'C' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'HealthStatus' | Should Be 'Healthy'"
+            }
+        }
+        
+        Context 'PhysicalDisk' {
+            
+            $results = PhysicalDisk physicalDisk0 HealthStatus { Should be 'Healthy' }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "PhysicalDisk property 'HealthStatus' for 'physicalDisk0' Should be 'Healthy'"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-PhysicalDisk -FriendlyName 'physicaldisk0' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'HealthStatus' | Should Be 'Healthy'"
+            }
+        }
     }
 }
 

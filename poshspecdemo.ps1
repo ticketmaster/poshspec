@@ -48,3 +48,14 @@ Describe 'Firewall' {
    Firewall putty.exe Profile { Should be 'Private' }
 }
 
+Describe 'Volume' {
+   Volume C FileSystem { Should be 'NTFS' }
+   Volume C HealthStatus { Should be 'Healthy' }
+}
+
+Describe 'PhysicalDisk' {
+   PhysicalDisk physicalDisk0 HealthStatus { Should be 'Healthy' }
+   PhysicalDisk physicalDisk0 OperationalStatus { Should be 'OK' }
+   PhysicalDisk physicalDisk0 Size { begreaterthan 1073741824 }
+}
+
