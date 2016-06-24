@@ -34,7 +34,7 @@ function Http {
         [scriptblock]$Should
     )    
     
-    $params = Get-PoshspecParam -TestName Http -TestExpression {Invoke-WebRequest -Uri '$Target' -ErrorAction SilentlyContinue} @PSBoundParameters
+    $params = Get-PoshspecParam -TestName Http -TestExpression {Invoke-WebRequest -Uri '$Target' -UseBasicParsing -ErrorAction SilentlyContinue} @PSBoundParameters
     
     Invoke-PoshspecExpression @params
 }
