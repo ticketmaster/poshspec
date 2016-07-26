@@ -36,11 +36,9 @@ function SoftwareProduct {
         [scriptblock]$Should
     )
     
-    $name = Split-Path -Path $Target -Leaf
-
     $expression = {Get-ItemProperty -Path hklm:\\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object DisplayName -Match '$Target'}
     
-    $params = Get-PoshspecParam -TestName SoftwareProduct -TestExpression $expression -FriendlyName $name @PSBoundParameters
+    $params = Get-PoshspecParam -TestName SoftwareProduct -TestExpression $expression @PSBoundParameters
     
     Invoke-PoshspecExpression @params
 }
