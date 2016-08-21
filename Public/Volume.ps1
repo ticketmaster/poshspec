@@ -22,18 +22,20 @@
 #>  
   
 function Volume {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="Default")]
     param(
-        [Parameter(Mandatory, Position=1)]
+        [Parameter(Mandatory, Position=1,ParameterSetName="Default")]
+        [Parameter(Mandatory, Position=1,ParameterSetName="Property")]
         [Alias('Name')]
         [string]$Target,
         
-        [Parameter(Position=2)]
+        [Parameter(Position=2,ParameterSetName="Property")]
         [ValidateSet('AllocationUnitSize', 'DedupMode', 'DriveLetter', 'DriveType', 'FileSystem', 'FileSystemLabel',
                      'FileSystemType', 'HealthStatus', 'ObjectId', 'OperationalStatus', 'Path', 'Size', 'SizeRemaining')]
         [string]$Property,
 
-        [Parameter(Mandatory, Position=3)]
+        [Parameter(Mandatory, Position=2,ParameterSetName="Default")]
+        [Parameter(Mandatory, Position=3,ParameterSetName="Property")]
         [scriptblock]$Should
     )
 
