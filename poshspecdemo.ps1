@@ -47,3 +47,8 @@ Describe 'Firewall' {
    Firewall putty.exe Profile { Should be 'Private' }
 }
 
+Describe 'Volume' {
+    Volume C DriveType { should be 'fixed' }
+    Volume C FileSystem { should be 'NTFS' }
+}
+
