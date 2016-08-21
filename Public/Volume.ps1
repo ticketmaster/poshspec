@@ -4,7 +4,7 @@
 .DESCRIPTION
     Can be specified to target a specific volume for testing
 .PARAMETER Target
-    Specifies the Drive Letter of the volume to test
+    Specifies the drive letter or file system label of the volume to test
 .PARAMETER Property
     Specifies an optional property to test for on the volume
 .PARAMETER Should 
