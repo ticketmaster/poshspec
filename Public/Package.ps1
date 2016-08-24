@@ -35,7 +35,7 @@ function Package {
         [scriptblock]$Should
     )
      
-    $expression = {Get-Package -Name '$Target' -ErrorAction SilentlyContinue}
+    $expression = {Get-Package -Name "$Target" -ErrorAction SilentlyContinue}
     
     $params = Get-PoshspecParam -TestName Package -TestExpression $expression @PSBoundParameters
     
