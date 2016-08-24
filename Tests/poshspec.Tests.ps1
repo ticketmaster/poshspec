@@ -352,6 +352,19 @@ Describe 'Test Functions' {
                 $results.Expression | Should Be "Get-ItemProperty -Path hklm:\\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object DisplayName -Match 'Microsoft .NET Framework 4.6.1' | Select-Object -ExpandProperty 'DisplayVersion' | Should Be 4.6.01055"
             }
         }
+
+        Context 'Volume' {
+
+            $results = Volume 'C' DriveType { Should Be 'Fixed' }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "Volume property 'DriveType' for 'C' Should Be 'Fixed'"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "GetVolume -Name 'C' | Select-Object -ExpandProperty 'DriveType' | Should Be 'Fixed'"
+            }
+        }
     }
 }
 
