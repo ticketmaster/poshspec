@@ -365,6 +365,18 @@ Describe 'Test Functions' {
                 $results.Expression | Should Be "GetVolume -Name 'C' | Select-Object -ExpandProperty 'DriveType' | Should Be 'Fixed'"
             }
         }
+
+        Context 'AuditPolicy' {
+
+            $results = AuditPolicy System 'Security System Extension' { Should Be 'Success' }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "AuditPolicy 'Security System Extension' Should Be 'Success'"
+            } 
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "GetAuditPolicy -Category 'System' -Subcategory 'Security System Extension' | Should Be 'Success'"
+            }
+        }
     }
 }
 
