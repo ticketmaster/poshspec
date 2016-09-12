@@ -189,10 +189,10 @@ Describe 'Test Functions' {
             }
             
             It 'Should return a correct text expression' {
-                $results.Expression | Should Be "Get-Package -Name 'Microsoft Visual Studio Code' -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty"
+                $results.Expression | Should Be 'Get-Package -Name "Microsoft Visual Studio Code" -ErrorAction SilentlyContinue | Select-Object -First 1 | Should Not BeNullOrEmpty'
             }
         }
-        
+       
         Context 'Package w/ properties' {
             
             $results = Package 'Microsoft Visual Studio Code' version { Should be '1.1.0' }
@@ -202,7 +202,20 @@ Describe 'Test Functions' {
             }
             
             It 'Should return a correct text expression' {
-                $results.Expression | Should Be "Get-Package -Name 'Microsoft Visual Studio Code' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'version' | Should be '1.1.0'"
+                $results.Expression | Should Be "Get-Package -Name ""Microsoft Visual Studio Code"" -ErrorAction SilentlyContinue | Select-Object -First 1 | Select-Object -ExpandProperty 'version' | Should be '1.1.0'"
+            }
+        }
+
+        Context 'Package w/Single Quotes' {
+            
+            $results = Package "Name 'subname'" { Should Not BeNullOrEmpty }
+            
+            It 'Should return a correct test name' {
+                $results.Name | Should Be "Package 'Name 'subname'' Should Not BeNullOrEmpty"
+            }
+            
+            It 'Should return a correct text expression' {
+                $results.Expression | Should Be "Get-Package -Name ""Name 'subname'"" -ErrorAction SilentlyContinue | Select-Object -First 1 | Should Not BeNullOrEmpty"
             }
         }
         
