@@ -391,7 +391,7 @@ Describe 'Test Functions' {
         }
 
         Context 'UserRightsAssignment' {
-
+            Mock Test-RunAsAdmin { return $true }
             $results = UserRightsAssignment ByRight 'SeNetworkLogonRight' { Should Be @("BUILTIN\Users","BUILTIN\Administrators") }
 
             It "Should return the correct test Name" {

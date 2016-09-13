@@ -99,7 +99,7 @@ function AuditPolicy {
         [scriptblock]$Should
     )
     Function GetAuditPolicy([string]$Category,[string]$Subcategory) {
-        If (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")){
+        If (Test-RunAsAdmin){
             auditpol /get /category:$Category |
                 Where-Object -FilterScript {$_ -match "^\s+$Subcategory"} | 
                     ForEach-Object -Process {($_.trim() -split "\s{2,}")[1]}
