@@ -189,10 +189,10 @@ Describe 'Test Functions' {
             }
             
             It 'Should return a correct text expression' {
-                $results.Expression | Should Be "Get-Package -Name 'Microsoft Visual Studio Code' -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty"
+                $results.Expression | Should Be 'Get-Package -Name "Microsoft Visual Studio Code" -ErrorAction SilentlyContinue | Select-Object -First 1 | Should Not BeNullOrEmpty'
             }
         }
-        
+       
         Context 'Package w/ properties' {
             
             $results = Package 'Microsoft Visual Studio Code' version { Should be '1.1.0' }
@@ -202,7 +202,20 @@ Describe 'Test Functions' {
             }
             
             It 'Should return a correct text expression' {
-                $results.Expression | Should Be "Get-Package -Name 'Microsoft Visual Studio Code' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'version' | Should be '1.1.0'"
+                $results.Expression | Should Be "Get-Package -Name ""Microsoft Visual Studio Code"" -ErrorAction SilentlyContinue | Select-Object -First 1 | Select-Object -ExpandProperty 'version' | Should be '1.1.0'"
+            }
+        }
+
+        Context 'Package w/Single Quotes' {
+            
+            $results = Package "Name 'subname'" { Should Not BeNullOrEmpty }
+            
+            It 'Should return a correct test name' {
+                $results.Name | Should Be "Package 'Name 'subname'' Should Not BeNullOrEmpty"
+            }
+            
+            It 'Should return a correct text expression' {
+                $results.Expression | Should Be "Get-Package -Name ""Name 'subname'"" -ErrorAction SilentlyContinue | Select-Object -First 1 | Should Not BeNullOrEmpty"
             }
         }
         
@@ -375,6 +388,18 @@ Describe 'Test Functions' {
             } 
             It "Should return the correct test Expression" {
                 $results.Expression | Should Be "GetAuditPolicy -Category 'System' -Subcategory 'Security System Extension' | Should Be 'Success'"
+            }
+        }
+
+        Context 'LocalUser' {
+
+            $results = LocalUser Guest Disabled { Should Be $True }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "LocalUser property 'Disabled' for 'Guest' Should Be `$True"
+            } 
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-CimInstance -ClassName Win32_UserAccount -filter `"LocalAccount=True AND Name='Guest'`" | Select-Object -ExpandProperty 'Disabled' | Should Be `$True"
             }
         }
     }

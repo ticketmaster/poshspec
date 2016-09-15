@@ -1,3 +1,10 @@
+# Version 2.1.14
+* Improved handling of single quotes  in Package function
+* Added Functions for
+  * LocalUser 
+  * AuditPolicy
+  * Volume
+
 # Version 2.1.6
 * Added Functions for 
   * Firewall
