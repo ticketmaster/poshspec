@@ -15,11 +15,13 @@
 .PARAMETER Should
     A Script Block defining a Pester Assertion.
 .EXAMPLE
-    ServerFeature IIS-WebServer { Should Not BeNullOrEmpty }
+    ServerFeature Web-Server { Should be $true }
 .EXAMPLE
-    ServerFeature TelnetClient { Should BeNullOrEmpty }
+    ServerFeature TelnetClient { Should Be $false }
 .EXAMPLE
-    ServerFeature IIS-WebServer
+    ServerFeature Web-Server InstallState { Should Be 'Installed' }
+.EXAMPLE
+    ServerFeature Remote-Access InstallState { Should Be 'Available' }
 .NOTES
     Assertions: Be, BeNullOrEmpty
 #>
