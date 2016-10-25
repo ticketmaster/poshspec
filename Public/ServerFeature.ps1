@@ -11,7 +11,7 @@
 .PARAMETER Target
     The Windows feature name to test for
 .PARAMETER Property
-    The optional property on the feature to test for. If not specified, will default to the 'Name' property.
+    The optional property on the feature to test for. If not specified, will default to the 'Installed' property.
 .PARAMETER Should
     A Script Block defining a Pester Assertion.
 .EXAMPLE
