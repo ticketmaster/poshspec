@@ -414,6 +414,19 @@ Describe 'Test Functions' {
                 $results.Expression | Should Be "Get-AccountsWithUserRight -Right 'SeNetworkLogonRight' | Select-Object -ExpandProperty Account | Should Be @(`"BUILTIN\Users`",`"BUILTIN\Administrators`")"
             }
         }
+
+        Context 'ServerFeature' {
+
+            $results = ServerFeature 'Telnet-Client' 'Installed' { Should Be $false }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "ServerFeature property 'Installed' for 'Telnet-Client' Should Be `$false"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "GetFeature -Name Telnet-Client | Select-Object -ExpandProperty 'Installed' | Should be `$false"
+            }
+        }
     }
 }
 
