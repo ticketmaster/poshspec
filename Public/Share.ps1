@@ -10,7 +10,7 @@
 .EXAMPLE
     Share 'MyShare' { should not BeNullOrEmpty }    
 .EXAMPLE
-    LocalGroup 'BadShare' { should BeNullOrEmpty }
+    Share 'BadShare' { should BeNullOrEmpty }
 .NOTES
     Assertions: BeNullOrEmpty
 #>
