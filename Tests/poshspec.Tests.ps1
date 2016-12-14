@@ -231,6 +231,19 @@ Describe 'Test Functions' {
                 $results.Expression | Should Be 'Get-CimInstance -ClassName Win32_Group -Filter "Name = ''Administrators''" | Should Not BeNullOrEmpty'
             }
         }
+
+        Context 'Share' {
+            
+            $results = Share 'MyShare' { Should Not BeNullOrEmpty }
+            
+            It 'Should return a correct test name' {
+                $results.Name | Should Be "Share 'MyShare' Should Not BeNullOrEmpty"
+            }
+            
+            It 'Should return a correct text expression' {
+                $results.Expression | Should Be 'Get-CimInstance -ClassName Win32_Share -Filter "Name = ''MyShare''" | Should Not BeNullOrEmpty'
+            }
+        }
         
         Context 'Interface' {
             $results = Interface ethernet0 { Should Not BeNullOrEmpty }
