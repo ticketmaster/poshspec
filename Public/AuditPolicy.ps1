@@ -40,7 +40,6 @@ function AuditPolicy {
         [Alias("Subcategory")]
         [ValidateSet(
             "Security System Extension",
-            "Security System Extension",
             "System Integrity",
             "IPsec Driver",
             "Other System Events",
