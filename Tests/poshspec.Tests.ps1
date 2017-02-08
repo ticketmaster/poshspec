@@ -362,7 +362,7 @@ Describe 'Test Functions' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-ItemProperty -Path hklm:\\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object DisplayName -Match 'Microsoft .NET Framework 4.6.1' | Should Exist"
+                $results.Expression | Should Be "@('HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*','HKLM:\\Software\Microsoft\Windows\CurrentVersion\Uninstall\*') | Where-Object { Test-Path $_ } | Get-ItemProperty | Where-Object DisplayName -Match 'Microsoft .NET Framework 4.6.1' | Should Exist"
             }
         }
         
@@ -375,7 +375,7 @@ Describe 'Test Functions' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-ItemProperty -Path hklm:\\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object DisplayName -Match 'Microsoft .NET Framework 4.6.1' | Select-Object -ExpandProperty 'DisplayVersion' | Should Be 4.6.01055"
+                $results.Expression | Should Be "@('HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*','HKLM:\\Software\Microsoft\Windows\CurrentVersion\Uninstall\*') | Where-Object { Test-Path $_ } | Get-ItemProperty | Where-Object DisplayName -Match 'Microsoft .NET Framework 4.6.1' | Select-Object -ExpandProperty 'DisplayVersion' | Should Be 4.6.01055"
             }
         }
 
