@@ -1,23 +1,26 @@
-# Version 2.1.14
+# Version 2.1.15
 * Improved handling of single quotes  in Package function
 * Added Functions for
-  * LocalUser 
+  * LocalUser
   * AuditPolicy
   * Volume
+  * ServerFeature
+  * Share
+  * UserRightsAssignment
 
 # Version 2.1.6
-* Added Functions for 
+* Added Functions for
   * Firewall
 
 # Version 2.1.0
 * Broke Down PSM1 to Many Different Functions in their own files [No change in functionality]
-* Added Functions for 
+* Added Functions for
   * CheckSite
   * CheckAppPool
   * WebSite
-  * SoftwareProduct 
- 
-  
+  * SoftwareProduct
+
+
 # Version 1.2.2
 * Merged PR including 5 new functions
   * Package
