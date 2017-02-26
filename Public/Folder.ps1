@@ -26,7 +26,7 @@ function Folder {
     )
     
 
-    $params = Get-PoshspecParam -TestName Folder -TestExpression {'$Target'} @PSBoundParameters
+    $params = Get-PoshspecParam -TestName Folder -TestExpression {Get-Item -Path '$Target' -ErrorAction SilentlyContinue } @PSBoundParameters
     
     Invoke-PoshspecExpression @params
 }
