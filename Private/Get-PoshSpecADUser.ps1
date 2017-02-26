@@ -10,25 +10,24 @@ function Get-PoshSpecADUser {
     $DONT_EXPIRE_PASSWORD = 0x010000
     $PASSWORD_EXPIRED     = 0x800000
     
-    $users = SearchAd -Name $Name
+    $users = SearchAd -Name $Name -ObjectType 'User'
     foreach ($user in $users) 
     {   
-        [pscustomobject]@{
+        $output = @{
             SamAccountName       = $user.sAMAccountName
             Name                 = $user.name
             GivenName            = $user.givenName
             SurName              = $user.surName
             Mail                 = $user.mail
+            Department           = [string]([adsi]$user.path).department
             Enabled              = -not [bool]($user.userAccountControl -band $ACCOUNTDISABLE)
             PasswordNeverExpires = [bool]($user.userAccountControl -band $DONT_EXPIRE_PASSWORD)
             PasswordExpired      = [bool]($user.userAccountControl -band $PASSWORD_EXPIRED)
         }
+
+        $pathSplit = $user.path.TrimStart('LDAP://') -split ','
+        $output.OrganizationalUnit = $pathSplit[1..$pathSplit.Length] -join ','
+
+        [pscustomobject]$output
     }
-}
-
-function SearchAd {
-    param($Name)
-
-    $searcher = [adsisearcher]"(&(objectClass=user)(objectCategory=person)(Name=$Name))"
-    $searcher.FindAll()
 }

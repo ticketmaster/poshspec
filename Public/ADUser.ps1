@@ -20,7 +20,7 @@ function ADUser {
         [string]$Target,
 
         [Parameter(Position=2, ParameterSetName='prop')]
-        [ValidateSet('Enabled','GivenName','SurName')]
+        [ValidateSet('Enabled','GivenName','SurName','Department','OrganizationalUnit')]
         [string]$Property,
 
         [Parameter(Position=2, ParameterSetName='noprop')]

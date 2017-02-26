@@ -6,7 +6,7 @@ function Get-PoshSpecADOrganizationalUnit {
         [string]$Name
     )
 
-    $ous = SearchAd -Name $Name
+    $ous = SearchAd -Name $Name -ObjectType 'OrganizationalUnit'
     foreach ($o in $ous) 
     {   
         $ou = ([hashtable]$o.Properties).getenumerator()
@@ -15,11 +15,4 @@ function Get-PoshSpecADOrganizationalUnit {
             Path  = $o.Path.TrimStart('LDAP://')
         }
     }
-}
-
-function SearchAd {
-    param($Name)
-
-    $searcher = [adsisearcher]"(&(objectClass=organizationalUnit)(name=$Name))"
-    $searcher.FindAll()
 }

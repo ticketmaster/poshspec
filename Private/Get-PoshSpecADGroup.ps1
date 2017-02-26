@@ -37,22 +37,17 @@ function Get-PoshSpecADGroup {
         }
     }
 
-    $groups = SearchAd -Name $Name
-    foreach ($group in $groups) 
+    $groups = SearchAd -Name $Name -ObjectType 'Group'
+    foreach ($g in $groups) 
     {   
-        $type = (([hashtable]$group.Properties).getenumerator() | where {$_.Key -eq 'groupType'}).value
+        $group = [adsi]$g.path
+        $groupType = [string]$group.groupType
+
         [pscustomobject]@{
-            SamAccountName  = $group.sAMAccountName
-            Name            = $group.name
-            Scope           = $groupTypes[$type].Scope
-            Type            = $groupTypes[$type].Type
+            SamAccountName  = [string]$group.sAMAccountName
+            Name            = [string]$group.name
+            Scope           = $groupTypes[[int]$groupType].Scope
+            Type            = $groupTypes[[int]$groupType].Type
         }
     }
-}
-
-function SearchAd {
-    param($Name)
-
-    $searcher = [adsisearcher]"(&(objectClass=group)(objectCategory=group)(name=$Name))"
-    $searcher.FindAll()
 }
