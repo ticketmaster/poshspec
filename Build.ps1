@@ -143,7 +143,7 @@ Task Test -depends Build {
 }
 
 Task Build -depends Clean -requiredVariables PublishDir, Exclude, ModuleName {
-    if ((Get-Command -Name Step-ModuleVersion).Source)
+    if ((Get-Command -Name Step-ModuleVersion -ErrorAction SilentlyContinue).Source)
     {
         Step-ModuleVersion -Path $ManifestPath
     }
