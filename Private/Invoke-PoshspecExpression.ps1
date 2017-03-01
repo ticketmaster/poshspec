@@ -8,6 +8,7 @@ function Invoke-PoshspecExpression {
         $InputObject
     )
     
+    Write-Verbose -Message "Invoking 'it' block with expression: $($InputObject.Expression)"
     It $InputObject.Name {
         Invoke-Expression $InputObject.Expression
     }    

@@ -19,9 +19,9 @@ function Get-PoshspecParam {
         [Parameter()]
         [string]
         $Qualifier,                   
-        [Parameter(Mandatory)]
+        [Parameter()]
         [scriptblock]
-        $Should
+        $Should = { Should Exist }
     )
     
     $assertion = $Should.ToString().Trim()
@@ -53,7 +53,17 @@ function Get-PoshspecParam {
 
     $expressionString = $ExecutionContext.InvokeCommand.ExpandString($expressionString)
     
-    $expressionString += " | $assertion"
+    switch ($assertion) {
+        'Should Exist' {
+            $expressionString += " | should not benullorempty"
+        }
+        'Should Not Exist' {
+            $expressionString += " | should benullorempty"
+        }
+        Default {
+            $expressionString += " | $assertion"
+        }
+    }
     
     Write-Output -InputObject ([PSCustomObject]@{Name = $nameString; Expression = $expressionString})
 }

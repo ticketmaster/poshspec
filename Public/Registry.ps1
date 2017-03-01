@@ -43,7 +43,7 @@ function Registry {
     }
     else 
     {
-        $expression = {'$Target'}
+        $expression = {Get-Item -Path '$Target' -ErrorAction SilentlyContinue }
     }
     
     $params = Get-PoshspecParam -TestName Registry -TestExpression $expression -FriendlyName $name @PSBoundParameters

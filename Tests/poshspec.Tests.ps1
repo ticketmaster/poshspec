@@ -1,4 +1,6 @@
 $ModuleManifestName = 'poshspec.psd1'
+
+Get-Module -Name 'PoshSpec' -All | Remove-Module
 Import-Module $PSScriptRoot\..\$ModuleManifestName
 
 Describe 'Module Manifest Tests' {
@@ -18,7 +20,7 @@ Describe 'Get-PoshspecParam' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-Item 'name' | Should Exist"
+                $results.Expression | Should Be "Get-Item 'name' | should not benullorempty"
             }            
         }
         
@@ -30,7 +32,7 @@ Describe 'Get-PoshspecParam' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-Item 'Spaced Value' | Should Exist"
+                $results.Expression | Should Be "Get-Item 'Spaced Value' | should not benullorempty"
             }            
         }        
         
@@ -42,7 +44,7 @@ Describe 'Get-PoshspecParam' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-Item 'name' 'Something' | Select-Object -ExpandProperty 'Something' | Should Exist"
+                $results.Expression | Should Be "Get-Item 'name' 'Something' | Select-Object -ExpandProperty 'Something' | should not benullorempty"
             }                
         }
         
@@ -54,10 +56,216 @@ Describe 'Get-PoshspecParam' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-Item 'name' 'Something' '1' | Select-Object -ExpandProperty 'Something' | Should Exist"
+                $results.Expression | Should Be "Get-Item 'name' 'Something' '1' | Select-Object -ExpandProperty 'Something' | should not benullorempty"
             }            
         }        
     }    
+}
+
+Describe 'Get-PoshSpecADOrganizatinalUnit' {
+    InModuleScope PoshSpec {
+
+        context 'OU Exists' {
+
+            mock 'SearchAd' {
+                [pscustomobject]@{
+                    Path = 'LDAP://ou1,DC=lab,DC=local'
+                    Properties = @{
+                        ou = 'ou1'
+                    }
+                }
+            }
+
+            $results = Get-PoshSpecADOrganizationalUnit -Name 'DoesExist'
+
+            it 'should return a single pscustomobject' {
+                @($results).Count | should be 1
+            }
+
+            it 'should return the expected name' {
+                $results.Name | should be 'ou1'
+            }
+
+            it 'should return the expected path' {
+                $results.Path | should be 'ou1,DC=lab,DC=local'
+            }
+
+        }
+
+        context 'OU does not exist' {
+            
+            mock 'SearchAd'
+
+            $results = Get-PoshSpecADOrganizationalUnit -Name 'DoesNotExist'
+
+            it 'should return nothing' {
+                $results | should BeNullOrEmpty
+            }
+
+        }
+    }
+}
+
+Describe 'Get-PoshSpecADGroup' {
+    InModuleScope PoshSpec {
+
+        context 'Group Exists' {
+
+             $testCases = @(
+                @{
+                    GroupTypeNumber = -2147483646
+                    ExpectedScope = 'Global'
+                    ExpectedType = 'Security'
+                }
+                @{
+                    GroupTypeNumber = -2147483644
+                    ExpectedScope = 'DomainLocal'
+                    ExpectedType = 'Security'
+                }
+                @{
+                    GroupTypeNumber = -2147483643
+                    ExpectedScope = 'Global'
+                    ExpectedType = 'Security'
+                }
+                @{
+                    GroupTypeNumber = -2147483640
+                    ExpectedScope = 'Universal'
+                    ExpectedType = 'Security'
+                }
+                @{
+                    GroupTypeNumber = 2
+                    ExpectedScope = 'Global'
+                    ExpectedType = 'Distribution'
+                }
+                @{
+                    GroupTypeNumber = 4
+                    ExpectedScope = 'DomainLocal'
+                    ExpectedType = 'Distribution'
+                }
+                @{
+                    GroupTypeNumber = 8
+                    ExpectedScope = 'Universal'
+                    ExpectedType = 'Distribution'
+                }
+            )
+
+            foreach ($case in $testCases) {
+
+                mock 'SearchAd' {
+                    [pscustomobject]@{
+                        samAccountName = 'samAccountName'
+                        name = 'name'
+                        Properties = @{
+                            groupType = $case.GroupTypeNumber
+                        }
+                    }
+                }
+
+                $results = Get-PoshSpecADGroup -Name 'DoesExist'
+
+                it "when the group type number is $($case.GroupTypeNumber) it should return a single pscustomobject" {
+                    @($results).Count | should be 1
+                }
+
+                it "when the group type number is $($case.GroupTypeNumber) it should return the expected samAccountName" {
+                    $results.SamAccountName | should be 'samAccountName'
+                }
+
+                it "when the group type number is $($case.GroupTypeNumber) it should return the expected name" {
+                    $results.Name | should be 'name'
+                }
+
+                it "when the group type number is $($case.GroupTypeNumber) it should return the scope of $($case.ExpectedScope)" {
+                    
+                    $results.Scope | should be $case.ExpectedScope
+                }
+
+                it "when the group type number is $($case.GroupTypeNumber) it should return the type of $($case.ExpectedType)" {
+
+                    $results.Type | should be $case.ExpectedType
+                    
+                }
+            }
+        }
+
+        context 'Group does not exist' {
+            
+            mock 'SearchAd'
+
+            $results = Get-PoshSpecADGroup -Name 'DoesNotExist'
+
+            it 'should return nothing' {
+                $results | should BeNullOrEmpty
+            }
+
+        }
+    }
+}
+
+Describe 'Get-PoshSpecADUser' {
+    InModuleScope PoshSpec {
+
+        context 'User Exists' {
+
+            mock 'SearchAd' {
+                [pscustomobject]@{
+                    samAccountName = 'samaccountnamehere'
+                    name = 'namehere'
+                    givenName = 'givenNameHere'
+                    surName = 'surnameHere'
+                    mail = 'mailhere'
+                    userAccountControl = 66048
+                }
+            }
+
+            $results = Get-PoshSpecADUser -Name 'DoesExist'
+
+            it 'should return a single pscustomobject' {
+                @($results).Count | should be 1
+            }
+
+            it 'should return the expected name' {
+                $results.Name | should be 'namehere'
+            }
+
+            it 'should return the expected GivenName' {
+                $results.GivenName | should be 'givenNameHere'
+            }
+
+            it 'should return the expected SurName' {
+                $results.SurName | should be 'surNameHere'
+            }
+            
+            it 'should return the expected Mail property' {
+                $results.Mail | should be 'mailhere'
+            }
+
+            it 'should return the expected Enabled property' {
+                $results.Enabled | should be $true
+            }
+
+            it 'should return the expected PasswordNeverExpires property' {
+                $results.PasswordNeverExpires | should be $true
+            }
+
+            it 'should return the expected PasswordExpired property' {
+                $results.PasswordExpired | should be $false
+            }
+
+        }
+
+        context 'User does not exist' {
+            
+            mock 'SearchAd'
+
+            $results = Get-PoshSpecADUser -Name 'DoesNotExist'
+
+            it 'should return nothing' {
+                $results | should BeNullOrEmpty
+            }
+
+        }
+    }
 }
 
 Describe 'Test Functions' {
@@ -86,7 +294,7 @@ Describe 'Test Functions' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "'C:\inetpub\wwwroot\iisstart.htm' | Should Exist"
+                $results.Expression | Should Be "Get-Item -Path 'C:\inetpub\wwwroot\iisstart.htm' -ErrorAction SilentlyContinue | should not benullorempty"
             }
         }
         
@@ -99,7 +307,7 @@ Describe 'Test Functions' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "'HKLM:\SOFTWARE\Microsoft\Rpc\ClientProtocols' | Should Exist"
+                $results.Expression | Should Be "Get-Item -Path 'HKLM:\SOFTWARE\Microsoft\Rpc\ClientProtocols' -ErrorAction SilentlyContinue | should not benullorempty"
             }
         }
         
@@ -151,7 +359,7 @@ Describe 'Test Functions' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-HotFix -Id KB1234567 -ErrorAction SilentlyContinue | Should Exist"
+                $results.Expression | Should Be "Get-HotFix -Id KB1234567 -ErrorAction SilentlyContinue | should not benullorempty"
             }
         }
         
@@ -277,7 +485,7 @@ Describe 'Test Functions' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "'C:\ProgramData' | Should Exist"
+                $results.Expression | Should Be "Get-Item -Path 'C:\ProgramData' -ErrorAction SilentlyContinue | should not benullorempty"
             }
         }
         

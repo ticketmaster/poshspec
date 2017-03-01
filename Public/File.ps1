@@ -26,7 +26,11 @@
     )
  
     $name = Split-Path -Path $Target -Leaf
-    $params = Get-PoshspecParam -TestName File -TestExpression {'$Target'} -FriendlyName $name @PSBoundParameters
+
+    $expression = {
+        Get-Item -Path '$Target' -ErrorAction SilentlyContinue
+    }
+    $params = Get-PoshspecParam -TestName File -TestExpression $expression -FriendlyName $name @PSBoundParameters
     
     Invoke-PoshspecExpression @params
 }
