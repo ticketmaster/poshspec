@@ -1,24 +1,24 @@
 <#
 .SYNOPSIS
-    Test an Web Site
+    Test an Application Pool
 .DESCRIPTION
-    Used To Determine if Web Site is Running and Validate Various Properties
+    Used To Determine if Application Pool is Running and Validate Various Properties
 .PARAMETER Target
-    The name of the Web Site to be Tested
+    The name of the App Pool to be Tested
 .PARAMETER Property
     The Property to be expanded. If Ommitted, Property Will Default to Status. Can handle nested objects within properties
 .PARAMETER Should
     A Script Block defining a Pester Assertion.
 .EXAMPLE
-    WebSite TestSite { Should be Started }
+    AppPool TestSite { Should be Started }
 .EXAMPLE
-    WebSite TestSite 'Applications["/"].Path' { Should be '/' }
+    AppPool TestSite ManagedPipelineMode { Should be 'Integrated' }
 .EXAMPLE
-    WebSite TestSite ProcessModel.IdentityType { Should be 'ApplicationPoolIdentity'}
+    AppPool TestSite ProcessModel.IdentityType { Should be 'ApplicationPoolIdentity'}
 .NOTES
     Assertions: be
 #>
-function WebSite {
+function AppPool {
     [CmdletBinding(DefaultParameterSetName="Default")]
     param(
         [Parameter(Mandatory, Position=1, ParameterSetName="Default")]
@@ -27,10 +27,7 @@ function WebSite {
         [string]$Target,
 
         [Parameter(Position=2, ParameterSetName="Property")]
-        [Parameter(Position=2, ParameterSetName="Index")]
         [string]$Property,
-
-        [Parameter(Position=3, ParameterSetName="Index")]
 
         [Parameter(Mandatory, Position=2, ParameterSetName="Default")]
         [Parameter(Mandatory, Position=3, ParameterSetName="Property")]
@@ -42,7 +39,7 @@ function WebSite {
       Import-Module IISAdministration
     }
     else {
-      . $GetIISSite
+      . $GetIISAppPool
     }
 
     $expression = $null
@@ -51,18 +48,18 @@ function WebSite {
     if (-not $PSBoundParameters.ContainsKey('Property')) {
       $Property = 'State'
       $PSBoundParameters.add('Property', $Property)
-      $expression = { Get-IISSite -Name '$Target' -ErrorAction SilentlyContinue }
-      $params = Get-PoshspecParam -TestName WebSite -TestExpression $expression @PSBoundParameters
+      $expression = { Get-IISAppPool -Name '$Target' -ErrorAction SilentlyContinue+ }
+      $params = Get-PoshspecParam -TestName AppPool -TestExpression $expression @PSBoundParameters
     }
 
     if ($Property -like '*.*') {
       $lastIndexOfPeriod = $Property.LastIndexOf('.')
       $Qualifier = $Property.substring(0, $lastIndexOfPeriod)
       $NewProperty = $Property.substring($lastIndexOfPeriod + 1)
-      $expression = { (Get-IISSite -Name '$Target' -ErrorAction SilentlyContinue).$Qualifier }
+      $expression = { (Get-IISAppPool -Name '$Target' -ErrorAction SilentlyContinue).$Qualifier }
       $paramsHash = @{
         Target = $Target
-        TestName = "WebSite"
+        TestName = "AppPool"
         TestExpression = $expression
         Property = $NewProperty
         Should = $Should
@@ -72,15 +69,15 @@ function WebSite {
     }
 
     else {
-      $expression = { Get-IISSite -Name '$Target' -ErrorAction SilentlyContinue }
-      $params = Get-PoshspecParam -TestName WebSite -TestExpression $expression @PSBoundParameters
+      $expression = { Get-IISAppPool -Name '$Target' -ErrorAction SilentlyContinue }
+      $params = Get-PoshspecParam -TestName AppPool -TestExpression $expression @PSBoundParameters
     }
 
     Invoke-PoshspecExpression @params
 }
 
-$GetIISSite = {
-  function Get-IISSite
+$GetIISAppPool = {
+  function Get-IisAppPool
   {
     [CmdletBinding()]
     Param
@@ -100,8 +97,8 @@ $GetIISSite = {
     {
       try
       {
-        Write-Verbose "Getting site $Name"
-        Write-Output $ServerManager.Sites[$Name]
+        Write-Verbose "Getting application pool $Name"
+        Write-Output $ServerManager.ApplicationPools[$Name]
       }
 
       catch
