@@ -131,14 +131,14 @@ Describe 'Test Functions' {
 
         Context 'TcpPort' {
 
-            $results = TcpPort localhost 80 PingSucceeded { Should Be $true }
+            $results = TcpPort localhost 80 PingSucceeded { Should Be $True }
 
             It "Should return the correct test Name" {
-                $results.Name | Should Be "TcpPort property 'PingSucceeded' for 'localhost' at '80' Should Be `$true"
+                $results.Name | Should Be "TcpPort property 'PingSucceeded' for 'localhost' at '80' Should Be `$True"
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Test-NetConnection -ComputerName localhost -Port 80 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'PingSucceeded' | Should Be `$true"
+                $results.Expression | Should Be "Test-NetConnection -ComputerName localhost -Port 80 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'PingSucceeded' | Should Be $True"
             }
         }
 
@@ -182,14 +182,14 @@ Describe 'Test Functions' {
 
         Context 'Package' {
 
-            $results = Package 'Microsoft Visual Studio Code' { Should Not BeNullOrEmpty }
+            $results = Package 'Microsoft Visual Studio Code' { should exist }
 
             It 'Should return a correct test name' {
-                $results.Name | Should Be "Package 'Microsoft Visual Studio Code' Should Not BeNullOrEmpty"
+                $results.Name | Should Be "Package 'Microsoft Visual Studio Code' should exist"
             }
 
             It 'Should return a correct text expression' {
-                $results.Expression | Should Be 'Get-Package -Name "Microsoft Visual Studio Code" -ErrorAction SilentlyContinue | Select-Object -First 1 | Should Not BeNullOrEmpty'
+                $results.Expression | Should Be 'Get-Package -Name "Microsoft Visual Studio Code" -ErrorAction SilentlyContinue | Select-Object -First 1 | should exist'
             }
         }
 
@@ -208,52 +208,52 @@ Describe 'Test Functions' {
 
         Context 'Package w/Single Quotes' {
 
-            $results = Package "Name 'subname'" { Should Not BeNullOrEmpty }
+            $results = Package "Name 'subname'" { should exist }
 
             It 'Should return a correct test name' {
-                $results.Name | Should Be "Package 'Name 'subname'' Should Not BeNullOrEmpty"
+                $results.Name | Should Be "Package 'Name 'subname'' should exist"
             }
 
             It 'Should return a correct text expression' {
-                $results.Expression | Should Be "Get-Package -Name ""Name 'subname'"" -ErrorAction SilentlyContinue | Select-Object -First 1 | Should Not BeNullOrEmpty"
+                $results.Expression | Should Be "Get-Package -Name ""Name 'subname'"" -ErrorAction SilentlyContinue | Select-Object -First 1 | should exist"
             }
         }
 
         Context 'LocalGroup' {
 
-            $results = LocalGroup 'Administrators' { Should Not BeNullOrEmpty }
+            $results = LocalGroup 'Administrators' { should exist }
 
             It 'Should return a correct test name' {
-                $results.Name | Should Be "LocalGroup 'Administrators' Should Not BeNullOrEmpty"
+                $results.Name | Should Be "LocalGroup 'Administrators' should exist"
             }
 
             It 'Should return a correct text expression' {
-                $results.Expression | Should Be 'Get-CimInstance -ClassName Win32_Group -Filter "Name = ''Administrators''" | Should Not BeNullOrEmpty'
+                $results.Expression | Should Be 'Get-CimInstance -ClassName Win32_Group -Filter "Name = ''Administrators''" | should exist'
             }
         }
 
         Context 'Share' {
 
-            $results = Share 'MyShare' { Should Not BeNullOrEmpty }
+            $results = Share 'MyShare' { should exist }
 
             It 'Should return a correct test name' {
-                $results.Name | Should Be "Share 'MyShare' Should Not BeNullOrEmpty"
+                $results.Name | Should Be "Share 'MyShare' should exist"
             }
 
             It 'Should return a correct text expression' {
-                $results.Expression | Should Be 'Get-CimInstance -ClassName Win32_Share -Filter "Name = ''MyShare''" | Should Not BeNullOrEmpty'
+                $results.Expression | Should Be 'Get-CimInstance -ClassName Win32_Share -Filter "Name = ''MyShare''" | should exist'
             }
         }
 
         Context 'Interface' {
-            $results = Interface ethernet0 { Should Not BeNullOrEmpty }
+            $results = Interface ethernet0 { should exist }
 
             It 'Should return a correct test name' {
-                $results.Name | Should Be "Interface 'ethernet0' Should Not BeNullOrEmpty"
+                $results.Name | Should Be "Interface 'ethernet0' should exist"
             }
 
             It 'Should return a correct text expression' {
-                $results.Expression | Should Be "Get-NetAdapter -Name 'ethernet0' -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty"
+                $results.Expression | Should Be "Get-NetAdapter -Name 'ethernet0' -ErrorAction SilentlyContinue | should exist"
             }
         }
 
@@ -282,14 +282,14 @@ Describe 'Test Functions' {
         }
 
         Context 'Dnshost' {
-            $results = DnsHost www.google.com { should not BeNullOrEmpty }
+            $results = DnsHost www.google.com { should exist }
 
             It "Should return the correct test Name" {
-                $results.Name | Should Be "DnsHost 'www.google.com' Should Not BeNullOrEmpty"
+                $results.Name | Should Be "DnsHost 'www.google.com' should exist"
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Resolve-DnsName -Name www.google.com -DnsOnly -NoHostsFile -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty"
+                $results.Expression | Should Be "Resolve-DnsName -Name www.google.com -DnsOnly -NoHostsFile -ErrorAction SilentlyContinue | should exist"
             }
         }
 
@@ -301,7 +301,7 @@ Describe 'Test Functions' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-WebSite -Name 'TestSite' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'state' | Should be 'Started'"
+                $results.Expression | Should Be "Get-IISSite -Name 'TestSite' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'state' | Should be 'Started'"
             }
         }
 
@@ -318,24 +318,24 @@ Describe 'Test Functions' {
         }
 
         Context 'WebSite with non-default Property' {
-          $results = WebSite TestSite Id { Should be 1 }
+          $results = WebSite TestSite ManagedPipelineMode { Should be 'Integrated' }
           It "Should return the correct test Name" {
-            $results.Name | Should Be "WebSite property 'ManagedPipelineMode' for 'TestSite' Should be '1'"
+            $results.Name | Should Be "WebSite property 'ManagedPipelineMode' for 'TestSite' Should be 'Integrated'"
           }
 
           It "Should return the correct test Expression" {
-            $results.Expression | Should Be "Get-WebSite -Name 'TestSite' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'Id' | Should be '1'"
+            $results.Expression | Should Be "Get-IISSite -Name 'TestSite' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'ManagedPipelineMode' | Should be 'Integrated'"
           }
         }
 
         Context 'WebSite with nested Property' {
           $results = WebSite TestSite 'Applications["/"].Path' { Should be '/' }
           It "Should return the correct test Name" {
-            $results.Name | Should Be "WebSite property 'Path' for 'TestSite' at 'Application["/"]' Should be '/'"
+            $results.Name | Should Be "WebSite property 'Path' for 'TestSite' at 'Applications[`"/`"]' Should be '/'"
           }
 
           It "Should return the correct test Expression" {
-            $results.Expression | Should Be "(Get-IISSite -Name 'TestSite' -ErrorAction SilentlyContinue).Applications[`"/`"] | Select-Object -ExpandProperty 'Path' | Should be '1'"
+            $results.Expression | Should Be "(Get-IISSite -Name 'TestSite' -ErrorAction SilentlyContinue).Applications[`"/`"] | Select-Object -ExpandProperty 'Path' | Should be '/'"
           }
         }
 
@@ -446,7 +446,7 @@ Describe 'Test Functions' {
                 $results.Name | Should Be "LocalUser property 'Disabled' for 'Guest' Should Be `$True"
             }
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-CimInstance -ClassName Win32_UserAccount -filter `"LocalAccount=True AND Name='Guest'`" | Select-Object -ExpandProperty 'Disabled' | Should Be `$True"
+                $results.Expression | Should Be "Get-CimInstance -ClassName Win32_UserAccount -filter `"LocalAccount=True AND Name='Guest'`" | Select-Object -ExpandProperty 'Disabled' | Should Be $True"
             }
         }
 
@@ -464,14 +464,14 @@ Describe 'Test Functions' {
 
         Context 'ServerFeature' {
 
-            $results = ServerFeature 'Telnet-Client' 'Installed' { Should Be $false }
+            $results = ServerFeature 'Telnet-Client' 'Installed' { Should Be $False }
 
             It "Should return the correct test Name" {
-                $results.Name | Should Be "ServerFeature property 'Installed' for 'Telnet-Client' Should Be `$false"
+                $results.Name | Should Be "ServerFeature property 'Installed' for 'Telnet-Client' Should Be `$False"
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "GetFeature -Name Telnet-Client | Select-Object -ExpandProperty 'Installed' | Should be `$false"
+                $results.Expression | Should Be "GetFeature -Name Telnet-Client | Select-Object -ExpandProperty 'Installed' | Should be $False"
             }
         }
     }
