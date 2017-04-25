@@ -1,5 +1,8 @@
-# Version 2.1.15
-* Improved handling of single quotes  in Package function
+# Version 2.1.19
+* Expanded functionality for WebSite and AppPool [#49](https://github.com/Ticketmaster/poshspec/pull/49) [#50](https://github.com/Ticketmaster/poshspec/pull/50)
+
+# Version 2.1.16
+* Improved handling of single quotes in Package function
 * Added Functions for
   * LocalUser
   * AuditPolicy
