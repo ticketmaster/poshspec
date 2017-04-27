@@ -55,20 +55,22 @@ function WebSite {
       $params = Get-PoshspecParam -TestName WebSite -TestExpression $expression @PSBoundParameters
     }
 
-    if ($Property -like '*.*') {
-      $lastIndexOfPeriod = $Property.LastIndexOf('.')
-      $Qualifier = $Property.substring(0, $lastIndexOfPeriod)
-      $NewProperty = $Property.substring($lastIndexOfPeriod + 1)
-      $expression = { (Get-IISSite -Name '$Target' -ErrorAction SilentlyContinue).$Qualifier }
-      $paramsHash = @{
-        Target = $Target
-        TestName = "WebSite"
-        TestExpression = $expression
-        Property = $NewProperty
-        Should = $Should
-        Qualifier = $Qualifier
+    if ($Property -like '*.*' -or $Property -like '*(*' -or $Property -like '*)*')  {
+      . $expand
+      $expr = expand "Get-IISSite -Name `"$Target`" -ErrorAction SilentlyContinue" $Property
+      $expression = { $expr }
+      $params = Get-PoshspecParam -TestName Website -TestExpression $expression -Target $Target -Should $Should
+      if ($Property -like '*.*') {
+        $lastIndexOfPeriod = $Property.LastIndexOf('.')
+        $Qualifier = $Property.substring(0, $lastIndexOfPeriod)
+        $NewProperty = $Property.substring($lastIndexOfPeriod + 1)
+        $assertion = $Should.ToString().Trim()
+        $params.Name = "{0} property '{1}' at {2} for '{3}' {4}" -f 'Website', $NewProperty, $Qualifier, $Target, $assertion
       }
-      $params = Get-PoshspecParam @paramsHash
+      else {
+        $assertion = $Should.ToString().Trim()
+        $params.Name = "{0} property '{1}' for '{2}' '{3}'" -f 'AppPool', $Property, $Target, $assertion
+      }
     }
 
     else {
@@ -77,6 +79,13 @@ function WebSite {
     }
 
     Invoke-PoshspecExpression @params
+}
+
+$expand = {
+  function expand($item, $selector) {
+    $cmd = [scriptblock]::Create('(' + $item + ')' + '.' + $selector)
+    Write-Output $cmd.ToString()
+  }
 }
 
 $GetIISSite = {
