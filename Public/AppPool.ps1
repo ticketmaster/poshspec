@@ -48,24 +48,26 @@ function AppPool {
     if (-not $PSBoundParameters.ContainsKey('Property')) {
       $Property = 'State'
       $PSBoundParameters.add('Property', $Property)
-      $expression = { Get-IISAppPool -Name '$Target' -ErrorAction SilentlyContinue+ }
+      $expression = { Get-IISAppPool -Name '$Target' -ErrorAction SilentlyContinue }
       $params = Get-PoshspecParam -TestName AppPool -TestExpression $expression @PSBoundParameters
     }
 
-    if ($Property -like '*.*') {
-      $lastIndexOfPeriod = $Property.LastIndexOf('.')
-      $Qualifier = $Property.substring(0, $lastIndexOfPeriod)
-      $NewProperty = $Property.substring($lastIndexOfPeriod + 1)
-      $expression = { (Get-IISAppPool -Name '$Target' -ErrorAction SilentlyContinue).$Qualifier }
-      $paramsHash = @{
-        Target = $Target
-        TestName = "AppPool"
-        TestExpression = $expression
-        Property = $NewProperty
-        Should = $Should
-        Qualifier = $Qualifier
+    if ($Property -like '*.*' -or $Property -like '*(*' -or $Property -like '*)*') {
+      . $expand
+      $expr = expand "Get-IISAppPool -Name `"$Target`" -ErrorAction SilentlyContinue" $Property
+      $expression = { $expr }
+      $params = Get-PoshspecParam -TestName AppPool -TestExpression $expression -Target $Target -Should $Should
+      if ($Property -like '*.*') {
+        $lastIndexOfPeriod = $Property.LastIndexOf('.')
+        $Qualifier = $Property.substring(0, $lastIndexOfPeriod)
+        $NewProperty = $Property.substring($lastIndexOfPeriod + 1)
+        $assertion = $Should.ToString().Trim()
+        $params.Name = "{0} property '{1}' at {2} for '{3}' {4}" -f 'AppPool', $NewProperty, $Qualifier, $Target, $assertion
       }
-      $params = Get-PoshspecParam @paramsHash
+      else {
+        $assertion = $Should.ToString().Trim()
+        $params.Name = "{0} property '{1}' for '{2}' '{3}'" -f 'AppPool', $Property, $Target, $assertion
+      }
     }
 
     else {
@@ -74,6 +76,13 @@ function AppPool {
     }
 
     Invoke-PoshspecExpression @params
+}
+
+$expand = {
+  function expand($item, $selector) {
+    $cmd = [scriptblock]::Create('(' + $item + ')' + '.' + $selector)
+    Write-Output $cmd.ToString()
+  }
 }
 
 $GetIISAppPool = {
