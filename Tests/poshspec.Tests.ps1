@@ -294,18 +294,6 @@ Describe 'Test Functions' {
         }
 
         Context 'WebSite' {
-            $results =    WebSite TestSite state { Should be 'Started' }
-
-            It "Should return the correct test Name" {
-                $results.Name | Should Be "WebSite property 'state' for 'TestSite' Should be 'Started'"
-            }
-
-            It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-IISSite -Name 'TestSite' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'state' | Should be 'Started'"
-            }
-        }
-
-        Context 'WebSite' {
             $results = WebSite TestSite { Should be 'Started' }
 
             It "Should return the correct test Name" {
@@ -335,11 +323,20 @@ Describe 'Test Functions' {
           }
 
           It "Should return the correct test Expression" {
-            $results.Expression | Should Be "(Get-IISSite -Name 'TestSite' -ErrorAction SilentlyContinue).Applications[`"/`"] | Select-Object -ExpandProperty 'Path' | Should be '/'"
+            $results.Expression | Should Be "(Get-IISSite -Name 'TestSite' -ErrorAction SilentlyContinue).Applications[`"/`"].Path | Should be '/'"
           }
         }
 
+        Context 'WebSite with Method Invocation' {
+          $results = WebSite TestSite 'Bindings.Count' { Should be '1' }
+          It "Should return the correct test Name" {
+            $results.Name | Should Be "WebSite property 'Count' for 'TestSite' at 'Bindings' Should be '1'"
+          }
 
+          It "Should return the correct test Expression" {
+            $results.Expression | Should Be "(Get-IISSite -Name 'TestSite' -ErrorAction SilentlyContinue).Bindings.Count | Should be '1'"
+          }
+        }
         Context 'AppPool' {
             $results = AppPool TestSite { Should be 'Started' }
 
@@ -370,7 +367,18 @@ Describe 'Test Functions' {
           }
 
           It "Should return the correct test Expression" {
-            $results.Expression | Should Be "(Get-IISAppPool -Name 'TestSite' -ErrorAction SilentlyContinue).ProcessModel | Select-Object -ExpandProperty 'IdentityType' | Should be 'ApplicationPoolIdentity'"
+            $results.Expression | Should Be "(Get-IISAppPool -Name 'TestSite' -ErrorAction SilentlyContinue).ProcessModel.IdentityType | Should be 'ApplicationPoolIdentity'"
+          }
+        }
+
+        Context 'AppPool with Method Invocation' {
+          $results = AppPool TestSite 'ToString()' { Should be 'Microsoft.Web.Administration.ApplicationPool' }
+          It "Should return the correct test Name" {
+            $results.Name | Should Be "AppPool property 'ToString()' for 'TestSite' Should be 'Microsoft.Web.Administration.ApplicationPool'"
+          }
+
+          It "Should return the correct test Expression" {
+            $results.Expression | Should Be "(Get-IISAppPool -Name 'TestSite' -ErrorAction SilentlyContinue).ToString() | Should be 'Microsoft.Web.Administration.ApplicationPool'"
           }
         }
 

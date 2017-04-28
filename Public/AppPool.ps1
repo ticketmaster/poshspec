@@ -54,7 +54,7 @@ function AppPool {
 
     if ($Property -like '*.*' -or $Property -like '*(*' -or $Property -like '*)*') {
       . $expand
-      $expr = expand "Get-IISAppPool -Name `"$Target`" -ErrorAction SilentlyContinue" $Property
+      $expr = expand "Get-IISAppPool -Name '$Target' -ErrorAction SilentlyContinue" $Property
       $expression = { $expr }
       $params = Get-PoshspecParam -TestName AppPool -TestExpression $expression -Target $Target -Should $Should
       if ($Property -like '*.*') {
@@ -62,11 +62,11 @@ function AppPool {
         $Qualifier = $Property.substring(0, $lastIndexOfPeriod)
         $NewProperty = $Property.substring($lastIndexOfPeriod + 1)
         $assertion = $Should.ToString().Trim()
-        $params.Name = "{0} property '{1}' at {2} for '{3}' {4}" -f 'AppPool', $NewProperty, $Qualifier, $Target, $assertion
+        $params.Name = "{0} property '{1}' for '{2}' at '{3}' {4}" -f 'AppPool', $NewProperty, $Target, $Qualifier, $assertion
       }
       else {
         $assertion = $Should.ToString().Trim()
-        $params.Name = "{0} property '{1}' for '{2}' '{3}'" -f 'AppPool', $Property, $Target, $assertion
+        $params.Name = "{0} property '{1}' for '{2}' {3}" -f 'AppPool', $Property, $Target, $assertion
       }
     }
 
