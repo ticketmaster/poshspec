@@ -180,6 +180,19 @@ Describe 'Test Functions' {
             }
         }
 
+        Context 'CimObject with PropertyExpression' {
+
+            $results = CimObject 'root/Microsoft/Windows/TaskScheduler/MSFT_ScheduledTask' 'Where({$_.TaskName -match "xbl"}).Count' {Should be '2'}
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "CimObject property 'Count' for 'MSFT_ScheduledTask' at 'Where({`$_.TaskName -match `"xbl`"})' Should be '2'"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "(Get-CimInstance -ClassName MSFT_ScheduledTask -Namespace root/Microsoft/Windows/TaskScheduler).Where({`$_.TaskName -match `"xbl`"}).Count | Should be '2'"
+            }
+        }
+
         Context 'Package' {
 
             $results = Package 'Microsoft Visual Studio Code' { should exist }

@@ -56,21 +56,9 @@ function WebSite {
     }
 
     if ($Property -like '*.*' -or $Property -like '*(*' -or $Property -like '*)*')  {
-      . $expand
-      $expr = expand "Get-IISSite -Name '$Target' -ErrorAction SilentlyContinue" $Property
-      $expression = { $expr }
-      $params = Get-PoshspecParam -TestName Website -TestExpression $expression -Target $Target -Should $Should
-      if ($Property -like '*.*') {
-        $lastIndexOfPeriod = $Property.LastIndexOf('.')
-        $Qualifier = $Property.substring(0, $lastIndexOfPeriod)
-        $NewProperty = $Property.substring($lastIndexOfPeriod + 1)
-        $assertion = $Should.ToString().Trim()
-        $params.Name = "{0} property '{1}' for '{2}' at '{3}' {4}" -f 'Website', $NewProperty, $Target, $Qualifier, $assertion
-      }
-      else {
-        $assertion = $Should.ToString().Trim()
-        $params.Name = "{0} property '{1}' for '{2}' {3}" -f 'WebSite', $Property, $Target, $assertion
-      }
+      $expression = { Get-IISSite -Name '$Target' -ErrorAction SilentlyContinue }
+      $PropertyExpression = { $Property }
+      $params = Get-PoshspecParam -TestName Website -TestExpression $expression -Target $Target -Should $Should -PropertyExpression $Property
     }
 
     else {
@@ -79,13 +67,6 @@ function WebSite {
     }
 
     Invoke-PoshspecExpression @params
-}
-
-$expand = {
-  function expand($item, $selector) {
-    $cmd = [scriptblock]::Create('(' + $item + ')' + '.' + $selector)
-    Write-Output $cmd.ToString()
-  }
 }
 
 $GetIISSite = {
