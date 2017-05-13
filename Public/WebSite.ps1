@@ -55,20 +55,10 @@ function WebSite {
       $params = Get-PoshspecParam -TestName WebSite -TestExpression $expression @PSBoundParameters
     }
 
-    if ($Property -like '*.*') {
-      $lastIndexOfPeriod = $Property.LastIndexOf('.')
-      $Qualifier = $Property.substring(0, $lastIndexOfPeriod)
-      $NewProperty = $Property.substring($lastIndexOfPeriod + 1)
-      $expression = { (Get-IISSite -Name '$Target' -ErrorAction SilentlyContinue).$Qualifier }
-      $paramsHash = @{
-        Target = $Target
-        TestName = "WebSite"
-        TestExpression = $expression
-        Property = $NewProperty
-        Should = $Should
-        Qualifier = $Qualifier
-      }
-      $params = Get-PoshspecParam @paramsHash
+    if ($Property -like '*.*' -or $Property -like '*(*' -or $Property -like '*)*')  {
+      $expression = { Get-IISSite -Name '$Target' -ErrorAction SilentlyContinue }
+      $PropertyExpression = { $Property }
+      $params = Get-PoshspecParam -TestName Website -TestExpression $expression -Target $Target -Should $Should -PropertyExpression $Property
     }
 
     else {

@@ -1,56 +1,84 @@
 function Get-PoshspecParam {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="Default")]
     param(
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory=$true, ParameterSetName="Default")]
+        [Parameter(Mandatory=$true, ParameterSetName="PropertyExpression")]
         [string]
         $TestName,
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory=$true, ParameterSetName="Default")]
+        [Parameter(Mandatory=$true, ParameterSetName="PropertyExpression")]
         [string]
         $TestExpression,
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory=$true, ParameterSetName="Default")]
+        [Parameter(Mandatory=$true, ParameterSetName="PropertyExpression")]
         [string]
         $Target,
-        [Parameter()]
+        [Parameter(ParameterSetName="Default")]
         [string]
         $FriendlyName,
-        [Parameter()]
+        [Parameter(ParameterSetName="Default")]
         [string]
         $Property,
-        [Parameter()]
+        [Parameter(Mandatory=$true, ParameterSetName="PropertyExpression")]
+        [string]
+        $PropertyExpression,
+        [Parameter(ParameterSetName="Default")]
+        [Parameter(ParameterSetName="PropertyExpression")]
         [string]
         $Qualifier,
-        [Parameter()]
+        [Parameter(Mandatory=$true, ParameterSetName="Default")]
+        [Parameter(Mandatory=$true, ParameterSetName="PropertyExpression")]
         [scriptblock]
         $Should
     )
 
     $assertion = $Should.ToString().Trim()
-
-    if (-not $PSBoundParameters.ContainsKey("FriendlyName"))
-    {
-        $FriendlyName = $Target
-    }
-
     $expressionString = $TestExpression.ToString().Trim()
-
-    if ($PSBoundParameters.ContainsKey("Property"))
+    $PropertyExpression = $PropertyExpression.ToString().Trim()
+    if ($PSBoundParameters.ContainsKey("PropertyExpression"))
     {
-        $expressionString += " | Select-Object -ExpandProperty '$Property'"
-
-        if ($PSBoundParameters.ContainsKey("Qualifier"))
-        {
-            $nameString = "{0} property '{1}' for '{2}' at '{3}' {4}" -f $TestName,$Property, $FriendlyName, $Qualifier, $assertion
-        }
-        else
-        {
-            $nameString = "{0} property '{1}' for '{2}' {3}" -f $TestName, $Property, $FriendlyName, $assertion
-        }
+      $expressionString = $ExecutionContext.InvokeCommand.ExpandString($expressionString)
+      $expressionString = Expand-PoshspecTestExpression $expressionString $PropertyExpression
+      if ($PropertyExpression -like '*.*') {
+        $lastIndexOfPeriod = $PropertyExpression.LastIndexOf('.')
+        $Qualifier = $PropertyExpression.substring(0, $lastIndexOfPeriod)
+        $NewProperty = $PropertyExpression.substring($lastIndexOfPeriod + 1)
+        $nameString = "{0} property '{1}' for '{2}' at '{3}' {4}" -f $TestName, $NewProperty, $Target, $Qualifier, $assertion
+      }
+      else {
+        $nameString = "{0} property '{1}' for '{2}' {3}" -f $TestName, $PropertyExpression, $Target, $assertion
+      }
+      $expressionString += " | $assertion"
+      Write-Output -InputObject ([PSCustomObject]@{Name = $nameString; Expression = $expressionString})
     }
     else
     {
-        $nameString = "{0} '{1}' {2}" -f $TestName, $FriendlyName, $assertion
+      if (-not $PSBoundParameters.ContainsKey("FriendlyName"))
+      {
+          $FriendlyName = $Target
+      }
+
+      $expressionString = $TestExpression.ToString().Trim()
+
+      if ($PSBoundParameters.ContainsKey("Property"))
+      {
+          $expressionString += " | Select-Object -ExpandProperty '$Property'"
+
+          if ($PSBoundParameters.ContainsKey("Qualifier"))
+          {
+              $nameString = "{0} property '{1}' for '{2}' at '{3}' {4}" -f $TestName,$Property, $FriendlyName, $Qualifier, $assertion
+          }
+          else
+          {
+              $nameString = "{0} property '{1}' for '{2}' {3}" -f $TestName, $Property, $FriendlyName, $assertion
+          }
+      }
+      else
+      {
+          $nameString = "{0} '{1}' {2}" -f $TestName, $FriendlyName, $assertion
+      }
+      $expressionString += " | $assertion"
+      $expressionString = $ExecutionContext.InvokeCommand.ExpandString($expressionString)
+      Write-Output -InputObject ([PSCustomObject]@{Name = $nameString; Expression = $expressionString})
     }
-    $expressionString += " | $assertion"
-    $expressionString = $ExecutionContext.InvokeCommand.ExpandString($expressionString)
-    Write-Output -InputObject ([PSCustomObject]@{Name = $nameString; Expression = $expressionString})
 }
