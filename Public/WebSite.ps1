@@ -37,7 +37,7 @@ function WebSite {
         [scriptblock]$Should
     )
 
-    $IISAdmin = Get-Module -ListAvailable | ? { $_.Name -match 'IISAdministration' }
+    $IISAdmin = Get-Module -Name 'IISAdministration'
     if ($IISAdmin) {
       Import-Module IISAdministration
     }
