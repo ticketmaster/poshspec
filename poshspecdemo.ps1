@@ -1,6 +1,6 @@
-﻿#Requires -Module Poshspec
+#Requires -Module Poshspec
 
-Describe 'Services' {    
+Describe 'Services' {
     Service w32time Status { Should Be Running }
     Service bits Status { Should Be Stopped }
 }
