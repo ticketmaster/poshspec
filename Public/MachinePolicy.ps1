@@ -8,12 +8,12 @@
 .PARAMETER Should 
     A Script Block defining a Pester Assertion.  
 .EXAMPLE
-    GroupPolicy 'VeryImportantGPO-1' { should not BeNullOrEmpty }    
+    MachinePolicy 'VeryImportantGPO-1' { should not BeNullOrEmpty }    
 .NOTES
     Assertions: BeNullOrEmpty
 #>
     
-function GroupPolicy {
+function MachinePolicy {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory, Position=1)]

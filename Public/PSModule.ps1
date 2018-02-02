@@ -17,7 +17,7 @@
     Assertions: Be, BeNullOrEmpty, Exist, BeGreaterThan
 #> 
   
-function Module {
+function PSModule {
     [CmdletBinding(DefaultParameterSetName="Default")]
     param(
         [Parameter(Mandatory, Position=1,ParameterSetName="Default")]
