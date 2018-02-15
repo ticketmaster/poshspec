@@ -39,7 +39,7 @@ function PSModule {
         $expression = {Get-Module -Name $Target -ListAvailable -ErrorAction SilentlyContinue | Select-Object -First 1 }
      }
     
-    $params = Get-PoshspecParam -TestName Package -TestExpression $expression @PSBoundParameters
+    $params = Get-PoshspecParam -TestName PSModule -TestExpression $expression @PSBoundParameters
     
     Invoke-PoshspecExpression @params
 }
