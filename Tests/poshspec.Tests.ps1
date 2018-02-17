@@ -1,6 +1,4 @@
 $ModuleManifestName = 'poshspec.psd1'
-
-Get-Module -Name 'PoshSpec' -All | Remove-Module
 Import-Module $PSScriptRoot\..\$ModuleManifestName
 
 Describe 'Module Manifest Tests' {
@@ -20,10 +18,10 @@ Describe 'Get-PoshspecParam' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-Item 'name' | should not benullorempty"
-            }            
+                $results.Expression | Should Be "Get-Item 'name' | Should Exist"
+            }
         }
-        
+
         Context 'One Parameter with a space' {
             $results = Get-PoshspecParam -TestName MyTest -TestExpression {Get-Item '$Target'} -Target "Spaced Value" -Should { Should Exist }
 
@@ -32,10 +30,10 @@ Describe 'Get-PoshspecParam' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-Item 'Spaced Value' | should not benullorempty"
-            }            
-        }        
-        
+                $results.Expression | Should Be "Get-Item 'Spaced Value' | Should Exist"
+            }
+        }
+
         Context 'Two Parameters' {
             $results = Get-PoshspecParam -TestName MyTest -TestExpression {Get-Item '$Target' '$Property'} -Target Name -Property Something -Should { Should Exist }
 
@@ -44,10 +42,10 @@ Describe 'Get-PoshspecParam' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-Item 'name' 'Something' | Select-Object -ExpandProperty 'Something' | should not benullorempty"
-            }                
+                $results.Expression | Should Be "Get-Item 'name' 'Something' | Select-Object -ExpandProperty 'Something' | Should Exist"
+            }
         }
-        
+
         Context 'Three Parameters' {
             $results = Get-PoshspecParam -TestName MyTest -TestExpression {Get-Item '$Target' '$Property' '$Qualifier'} -Target Name -Property Something -Qualifier 1 -Should { Should Exist }
 
@@ -56,214 +54,8 @@ Describe 'Get-PoshspecParam' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-Item 'name' 'Something' '1' | Select-Object -ExpandProperty 'Something' | should not benullorempty"
-            }            
-        }        
-    }    
-}
-
-Describe 'Get-PoshSpecADOrganizatinalUnit' {
-    InModuleScope PoshSpec {
-
-        context 'OU Exists' {
-
-            mock 'SearchAd' {
-                [pscustomobject]@{
-                    Path = 'LDAP://ou1,DC=lab,DC=local'
-                    Properties = @{
-                        ou = 'ou1'
-                    }
-                }
+                $results.Expression | Should Be "Get-Item 'name' 'Something' '1' | Select-Object -ExpandProperty 'Something' | Should Exist"
             }
-
-            $results = Get-PoshSpecADOrganizationalUnit -Name 'DoesExist'
-
-            it 'should return a single pscustomobject' {
-                @($results).Count | should be 1
-            }
-
-            it 'should return the expected name' {
-                $results.Name | should be 'ou1'
-            }
-
-            it 'should return the expected path' {
-                $results.Path | should be 'ou1,DC=lab,DC=local'
-            }
-
-        }
-
-        context 'OU does not exist' {
-            
-            mock 'SearchAd'
-
-            $results = Get-PoshSpecADOrganizationalUnit -Name 'DoesNotExist'
-
-            it 'should return nothing' {
-                $results | should BeNullOrEmpty
-            }
-
-        }
-    }
-}
-
-Describe 'Get-PoshSpecADGroup' {
-    InModuleScope PoshSpec {
-
-        context 'Group Exists' {
-
-             $testCases = @(
-                @{
-                    GroupTypeNumber = -2147483646
-                    ExpectedScope = 'Global'
-                    ExpectedType = 'Security'
-                }
-                @{
-                    GroupTypeNumber = -2147483644
-                    ExpectedScope = 'DomainLocal'
-                    ExpectedType = 'Security'
-                }
-                @{
-                    GroupTypeNumber = -2147483643
-                    ExpectedScope = 'Global'
-                    ExpectedType = 'Security'
-                }
-                @{
-                    GroupTypeNumber = -2147483640
-                    ExpectedScope = 'Universal'
-                    ExpectedType = 'Security'
-                }
-                @{
-                    GroupTypeNumber = 2
-                    ExpectedScope = 'Global'
-                    ExpectedType = 'Distribution'
-                }
-                @{
-                    GroupTypeNumber = 4
-                    ExpectedScope = 'DomainLocal'
-                    ExpectedType = 'Distribution'
-                }
-                @{
-                    GroupTypeNumber = 8
-                    ExpectedScope = 'Universal'
-                    ExpectedType = 'Distribution'
-                }
-            )
-
-            foreach ($case in $testCases) {
-
-                mock 'SearchAd' {
-                    [pscustomobject]@{
-                        samAccountName = 'samAccountName'
-                        name = 'name'
-                        Properties = @{
-                            groupType = $case.GroupTypeNumber
-                        }
-                    }
-                }
-
-                $results = Get-PoshSpecADGroup -Name 'DoesExist'
-
-                it "when the group type number is $($case.GroupTypeNumber) it should return a single pscustomobject" {
-                    @($results).Count | should be 1
-                }
-
-                it "when the group type number is $($case.GroupTypeNumber) it should return the expected samAccountName" {
-                    $results.SamAccountName | should be 'samAccountName'
-                }
-
-                it "when the group type number is $($case.GroupTypeNumber) it should return the expected name" {
-                    $results.Name | should be 'name'
-                }
-
-                it "when the group type number is $($case.GroupTypeNumber) it should return the scope of $($case.ExpectedScope)" {
-                    
-                    $results.Scope | should be $case.ExpectedScope
-                }
-
-                it "when the group type number is $($case.GroupTypeNumber) it should return the type of $($case.ExpectedType)" {
-
-                    $results.Type | should be $case.ExpectedType
-                    
-                }
-            }
-        }
-
-        context 'Group does not exist' {
-            
-            mock 'SearchAd'
-
-            $results = Get-PoshSpecADGroup -Name 'DoesNotExist'
-
-            it 'should return nothing' {
-                $results | should BeNullOrEmpty
-            }
-
-        }
-    }
-}
-
-Describe 'Get-PoshSpecADUser' {
-    InModuleScope PoshSpec {
-
-        context 'User Exists' {
-
-            mock 'SearchAd' {
-                [pscustomobject]@{
-                    samAccountName = 'samaccountnamehere'
-                    name = 'namehere'
-                    givenName = 'givenNameHere'
-                    surName = 'surnameHere'
-                    mail = 'mailhere'
-                    userAccountControl = 66048
-                }
-            }
-
-            $results = Get-PoshSpecADUser -Name 'DoesExist'
-
-            it 'should return a single pscustomobject' {
-                @($results).Count | should be 1
-            }
-
-            it 'should return the expected name' {
-                $results.Name | should be 'namehere'
-            }
-
-            it 'should return the expected GivenName' {
-                $results.GivenName | should be 'givenNameHere'
-            }
-
-            it 'should return the expected SurName' {
-                $results.SurName | should be 'surNameHere'
-            }
-            
-            it 'should return the expected Mail property' {
-                $results.Mail | should be 'mailhere'
-            }
-
-            it 'should return the expected Enabled property' {
-                $results.Enabled | should be $true
-            }
-
-            it 'should return the expected PasswordNeverExpires property' {
-                $results.PasswordNeverExpires | should be $true
-            }
-
-            it 'should return the expected PasswordExpired property' {
-                $results.PasswordExpired | should be $false
-            }
-
-        }
-
-        context 'User does not exist' {
-            
-            mock 'SearchAd'
-
-            $results = Get-PoshSpecADUser -Name 'DoesNotExist'
-
-            it 'should return nothing' {
-                $results | should BeNullOrEmpty
-            }
-
         }
     }
 }
@@ -278,10 +70,10 @@ Describe 'Test Functions' {
                 EvaluationTime = (Get-Date);
             }    
             return $Result     
-        }
-        
+        }        
+
         Context 'Service' {
-         
+
             $results = Service w32time Status { Should Be Running }
 
             It "Should return the correct test Name" {
@@ -292,7 +84,7 @@ Describe 'Test Functions' {
                 $results.Expression | Should Be "Get-Service -Name 'w32time' | Select-Object -ExpandProperty 'Status' | Should Be Running"
             }
         }
-        
+
         Context 'File' {
 
             $results = File C:\inetpub\wwwroot\iisstart.htm { Should Exist }
@@ -302,77 +94,77 @@ Describe 'Test Functions' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-Item -Path 'C:\inetpub\wwwroot\iisstart.htm' -ErrorAction SilentlyContinue | should not benullorempty"
+                $results.Expression | Should Be "'C:\inetpub\wwwroot\iisstart.htm' | Should Exist"
             }
         }
-        
+
         Context 'Registry w/o Properties' {
 
             $results = Registry HKLM:\SOFTWARE\Microsoft\Rpc\ClientProtocols { Should Exist }
-            
+
             It "Should return the correct test Name" {
                 $results.Name | Should Be "Registry 'ClientProtocols' Should Exist"
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-Item -Path 'HKLM:\SOFTWARE\Microsoft\Rpc\ClientProtocols' -ErrorAction SilentlyContinue | should not benullorempty"
+                $results.Expression | Should Be "'HKLM:\SOFTWARE\Microsoft\Rpc\ClientProtocols' | Should Exist"
             }
         }
-        
+
         Context 'Registry with Properties' {
-            
-            $results = Registry HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\ "NV Domain" { Should Be mybiz.local  }        
-            
+
+            $results = Registry HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\ "NV Domain" { Should Be mybiz.local  }
+
             It "Should return the correct test Name" {
                 $results.Name | Should Be "Registry property 'NV Domain' for 'Parameters' Should Be mybiz.local"
             }
 
             It "Should return the correct test Expression" {
                 $results.Expression | Should Be "Get-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\' | Select-Object -ExpandProperty 'NV Domain' | Should Be mybiz.local"
-            }            
+            }
         }
-        
+
         Context 'HTTP' {
-            
+
             $results = Http http://localhost StatusCode { Should Be 200 }
-            
+
             It "Should return the correct test Name" {
                 $results.Name | Should Be "Http property 'StatusCode' for 'http://localhost' Should Be 200"
             }
 
             It "Should return the correct test Expression" {
                 $results.Expression | Should Be "Invoke-WebRequest -Uri 'http://localhost' -UseBasicParsing -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'StatusCode' | Should Be 200"
-            }            
+            }
         }
-        
+
         Context 'TcpPort' {
 
-            $results = TcpPort localhost 80 PingSucceeded { Should Be $true }
-            
+            $results = TcpPort localhost 80 PingSucceeded { Should Be $True }
+
             It "Should return the correct test Name" {
-                $results.Name | Should Be "TcpPort property 'PingSucceeded' for 'localhost' at '80' Should Be `$true"
+                $results.Name | Should Be "TcpPort property 'PingSucceeded' for 'localhost' at '80' Should Be `$True"
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Test-NetConnection -ComputerName localhost -Port 80 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'PingSucceeded' | Should Be `$true"
-            }            
-        } 
-        
+                $results.Expression | Should Be "Test-NetConnection -ComputerName localhost -Port 80 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'PingSucceeded' | Should Be $True"
+            }
+        }
+
         Context 'Hotfix' {
-         
+
             $results = Hotfix KB1234567 { Should Exist }
-            
+
             It "Should return the correct test Name" {
                 $results.Name | Should Be "Hotfix 'KB1234567' Should Exist"
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-HotFix -Id KB1234567 -ErrorAction SilentlyContinue | should not benullorempty"
+                $results.Expression | Should Be "Get-HotFix -Id KB1234567 -ErrorAction SilentlyContinue | Should Exist"
             }
         }
-        
+
         Context 'CimObject w/o Namespace' {
-         
+
             $results = CimObject Win32_OperatingSystem SystemDirectory { Should Be C:\WINDOWS\system32 }
 
             It "Should return the correct test Name" {
@@ -382,9 +174,9 @@ Describe 'Test Functions' {
             It "Should return the correct test Expression" {
                 $results.Expression | Should Be "Get-CimInstance -ClassName Win32_OperatingSystem | Select-Object -ExpandProperty 'SystemDirectory' | Should Be C:\WINDOWS\system32"
             }
-        }        
+        }
         Context 'CimObject with Namespace' {
-         
+
             $results = CimObject root/Microsoft/Windows/DesiredStateConfiguration/MSFT_DSCConfigurationStatus Error { Should BeNullOrEmpty }
 
             It "Should return the correct test Name" {
@@ -394,97 +186,110 @@ Describe 'Test Functions' {
             It "Should return the correct test Expression" {
                 $results.Expression | Should Be "Get-CimInstance -ClassName MSFT_DSCConfigurationStatus -Namespace root/Microsoft/Windows/DesiredStateConfiguration | Select-Object -ExpandProperty 'Error' | Should BeNullOrEmpty"
             }
-        } 
-        
-        Context 'Package' {
-            
-            $results = Package 'Microsoft Visual Studio Code' { Should Not BeNullOrEmpty }
-            
-            It 'Should return a correct test name' {
-                $results.Name | Should Be "Package 'Microsoft Visual Studio Code' Should Not BeNullOrEmpty"
+        }
+
+        Context 'CimObject with PropertyExpression' {
+
+            $results = CimObject 'root/Microsoft/Windows/TaskScheduler/MSFT_ScheduledTask' 'Where({$_.TaskName -match "xbl"}).Count' {Should be '2'}
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "CimObject property 'Count' for 'MSFT_ScheduledTask' at 'Where({`$_.TaskName -match `"xbl`"})' Should be '2'"
             }
-            
-            It 'Should return a correct text expression' {
-                $results.Expression | Should Be 'Get-Package -Name "Microsoft Visual Studio Code" -ErrorAction SilentlyContinue | Select-Object -First 1 | Should Not BeNullOrEmpty'
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "(Get-CimInstance -ClassName MSFT_ScheduledTask -Namespace root/Microsoft/Windows/TaskScheduler).Where({`$_.TaskName -match `"xbl`"}).Count | Should be '2'"
             }
         }
-       
+
+        Context 'Package' {
+
+            $results = Package 'Microsoft Visual Studio Code' { should exist }
+
+            It 'Should return a correct test name' {
+                $results.Name | Should Be "Package 'Microsoft Visual Studio Code' should exist"
+            }
+
+            It 'Should return a correct text expression' {
+                $results.Expression | Should Be 'Get-Package -Name "Microsoft Visual Studio Code" -ErrorAction SilentlyContinue | Select-Object -First 1 | should exist'
+            }
+        }
+
         Context 'Package w/ properties' {
-            
+
             $results = Package 'Microsoft Visual Studio Code' version { Should be '1.1.0' }
-            
+
             It 'Should return a correct test name' {
                 $results.Name | Should Be "Package property 'version' for 'Microsoft Visual Studio Code' Should be '1.1.0'"
             }
-            
+
             It 'Should return a correct text expression' {
                 $results.Expression | Should Be "Get-Package -Name ""Microsoft Visual Studio Code"" -ErrorAction SilentlyContinue | Select-Object -First 1 | Select-Object -ExpandProperty 'version' | Should be '1.1.0'"
             }
         }
 
         Context 'Package w/Single Quotes' {
-            
-            $results = Package "Name 'subname'" { Should Not BeNullOrEmpty }
-            
+
+            $results = Package "Name 'subname'" { should exist }
+
             It 'Should return a correct test name' {
-                $results.Name | Should Be "Package 'Name 'subname'' Should Not BeNullOrEmpty"
+                $results.Name | Should Be "Package 'Name 'subname'' should exist"
             }
-            
+
             It 'Should return a correct text expression' {
-                $results.Expression | Should Be "Get-Package -Name ""Name 'subname'"" -ErrorAction SilentlyContinue | Select-Object -First 1 | Should Not BeNullOrEmpty"
+                $results.Expression | Should Be "Get-Package -Name ""Name 'subname'"" -ErrorAction SilentlyContinue | Select-Object -First 1 | should exist"
             }
         }
-        
+
         Context 'LocalGroup' {
-            
-            $results = LocalGroup 'Administrators' { Should Not BeNullOrEmpty }
-            
+
+            $results = LocalGroup 'Administrators' { should exist }
+
             It 'Should return a correct test name' {
-                $results.Name | Should Be "LocalGroup 'Administrators' Should Not BeNullOrEmpty"
+                $results.Name | Should Be "LocalGroup 'Administrators' should exist"
             }
-            
+
             It 'Should return a correct text expression' {
-                $results.Expression | Should Be 'Get-CimInstance -ClassName Win32_Group -Filter "Name = ''Administrators''" | Should Not BeNullOrEmpty'
+                $results.Expression | Should Be 'Get-CimInstance -ClassName Win32_Group -Filter "Name = ''Administrators''" | should exist'
             }
         }
 
         Context 'Share' {
-            
-            $results = Share 'MyShare' { Should Not BeNullOrEmpty }
-            
+
+            $results = Share 'MyShare' { should exist }
+
             It 'Should return a correct test name' {
-                $results.Name | Should Be "Share 'MyShare' Should Not BeNullOrEmpty"
+                $results.Name | Should Be "Share 'MyShare' should exist"
             }
-            
+
             It 'Should return a correct text expression' {
-                $results.Expression | Should Be 'Get-CimInstance -ClassName Win32_Share -Filter "Name = ''MyShare''" | Should Not BeNullOrEmpty'
+                $results.Expression | Should Be 'Get-CimInstance -ClassName Win32_Share -Filter "Name = ''MyShare''" | should exist'
             }
         }
-        
+
         Context 'Interface' {
-            $results = Interface ethernet0 { Should Not BeNullOrEmpty }
-            
+            $results = Interface ethernet0 { should exist }
+
             It 'Should return a correct test name' {
-                $results.Name | Should Be "Interface 'ethernet0' Should Not BeNullOrEmpty"
+                $results.Name | Should Be "Interface 'ethernet0' should exist"
             }
-            
+
             It 'Should return a correct text expression' {
-                $results.Expression | Should Be "Get-NetAdapter -Name 'ethernet0' -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty"
+                $results.Expression | Should Be "Get-NetAdapter -Name 'ethernet0' -ErrorAction SilentlyContinue | should exist"
             }
         }
-        
+
         Context 'Interface w/ properties' {
             $results = interface ethernet0 status { should be 'up' }
-            
+
             It 'Should return a correct test name' {
                 $results.Name | Should Be "Interface property 'status' for 'ethernet0' should be 'up'"
             }
-            
+
             It 'Should return a correct text expression' {
                 $results.Expression | Should Be "Get-NetAdapter -Name 'ethernet0' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'status' | Should Be 'up'"
             }
         }
-        
+
         Context 'Folder' {
             $results = Folder $env:ProgramData { should exist }
 
@@ -493,69 +298,111 @@ Describe 'Test Functions' {
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-Item -Path 'C:\ProgramData' -ErrorAction SilentlyContinue | should not benullorempty"
+                $results.Expression | Should Be "'C:\ProgramData' | Should Exist"
             }
         }
-        
+
         Context 'Dnshost' {
-            $results = DnsHost www.google.com { should not BeNullOrEmpty }
+            $results = DnsHost www.google.com { should exist }
 
             It "Should return the correct test Name" {
-                $results.Name | Should Be "DnsHost 'www.google.com' Should Not BeNullOrEmpty"
+                $results.Name | Should Be "DnsHost 'www.google.com' should exist"
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Resolve-DnsName -Name www.google.com -DnsOnly -NoHostsFile -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty"
-            }
-        }  
-             
-        Context 'WebSite' {
-            $results =    WebSite TestSite state { Should be 'Started' }
-
-            It "Should return the correct test Name" {
-                $results.Name | Should Be "WebSite property 'state' for 'TestSite' Should be 'Started'"
-            }
-
-            It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-WebSite -Name 'TestSite' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'state' | Should be 'Started'"
-            }
-        } 
-              
-        Context 'WebSiteBinding' {
-            $results = WebSiteBinding TestSite http protocol { Should be 'http' }
-
-            It "Should return the correct test Name" {
-                $results.Name | Should Be "WebSiteBinding property 'protocol' for 'TestSite' at 'http' Should be 'http'"
-            }
-
-            It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-WebBinding -Name 'TestSite' -protocol 'http' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'protocol' | Should be 'http'"
-            }
-        }             
-        Context 'AppPoolState' {
-            $results = AppPoolState TestSite { Should be 'Started' }
-
-            It "Should return the correct test Name" {
-                $results.Name | Should Be "AppPoolState property 'Value' for 'TestSite' Should be 'Started'"
-            }
-
-            It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-WebAppPoolState -Name 'TestSite' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'Value' | Should be 'Started'"
-            }
-        } 
-              
-        Context 'CheckAppPool' {
-            $results = CheckAppPool TestSite { Should be $true }
-
-            It "Should return the correct test Name" {
-                $results.Name | Should Be "CheckAppPool 'TestSite' Should be `$true"
-            }
-
-            It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Test-Path -Path `"IIS:\AppPools\TestSite`" -ErrorAction SilentlyContinue | Should be `$true"
+                $results.Expression | Should Be "Resolve-DnsName -Name www.google.com -DnsOnly -NoHostsFile -ErrorAction SilentlyContinue | should exist"
             }
         }
-                      
+
+        Context 'WebSite' {
+            $results = WebSite TestSite { Should be 'Started' }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "WebSite property 'State' for 'TestSite' Should be 'Started'"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-IISSite -Name 'TestSite' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'State' | Should be 'Started'"
+            }
+        }
+
+        Context 'WebSite with non-default Property' {
+          $results = WebSite TestSite ManagedPipelineMode { Should be 'Integrated' }
+          It "Should return the correct test Name" {
+            $results.Name | Should Be "WebSite property 'ManagedPipelineMode' for 'TestSite' Should be 'Integrated'"
+          }
+
+          It "Should return the correct test Expression" {
+            $results.Expression | Should Be "Get-IISSite -Name 'TestSite' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'ManagedPipelineMode' | Should be 'Integrated'"
+          }
+        }
+
+        Context 'WebSite with nested Property' {
+          $results = WebSite TestSite 'Applications["/"].Path' { Should be '/' }
+          It "Should return the correct test Name" {
+            $results.Name | Should Be "WebSite property 'Path' for 'TestSite' at 'Applications[`"/`"]' Should be '/'"
+          }
+
+          It "Should return the correct test Expression" {
+            $results.Expression | Should Be "(Get-IISSite -Name 'TestSite' -ErrorAction SilentlyContinue).Applications[`"/`"].Path | Should be '/'"
+          }
+        }
+
+        Context 'WebSite with Method Invocation' {
+          $results = WebSite TestSite 'Bindings.Count' { Should be '1' }
+          It "Should return the correct test Name" {
+            $results.Name | Should Be "WebSite property 'Count' for 'TestSite' at 'Bindings' Should be '1'"
+          }
+
+          It "Should return the correct test Expression" {
+            $results.Expression | Should Be "(Get-IISSite -Name 'TestSite' -ErrorAction SilentlyContinue).Bindings.Count | Should be '1'"
+          }
+        }
+        Context 'AppPool' {
+            $results = AppPool TestSite { Should be 'Started' }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "AppPool property 'State' for 'TestSite' Should be 'Started'"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-IISAppPool -Name 'TestSite' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'State' | Should be 'Started'"
+            }
+        }
+
+        Context 'AppPool with non-default Property' {
+          $results = AppPool TestSite ManagedPipelineMode { Should be 'Integrated' }
+          It "Should return the correct test Name" {
+            $results.Name | Should Be "AppPool property 'ManagedPipelineMode' for 'TestSite' Should be 'Integrated'"
+          }
+
+          It "Should return the correct test Expression" {
+            $results.Expression | Should Be "Get-IISAppPool -Name 'TestSite' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'ManagedPipelineMode' | Should be 'Integrated'"
+          }
+        }
+
+        Context 'AppPool with nested Property' {
+          $results = AppPool TestSite ProcessModel.IdentityType { Should be 'ApplicationPoolIdentity' }
+          It "Should return the correct test Name" {
+            $results.Name | Should Be "AppPool property 'IdentityType' for 'TestSite' at 'ProcessModel' Should be 'ApplicationPoolIdentity'"
+          }
+
+          It "Should return the correct test Expression" {
+            $results.Expression | Should Be "(Get-IISAppPool -Name 'TestSite' -ErrorAction SilentlyContinue).ProcessModel.IdentityType | Should be 'ApplicationPoolIdentity'"
+          }
+        }
+
+        Context 'AppPool with Method Invocation' {
+          $results = AppPool TestSite 'ToString()' { Should be 'Microsoft.Web.Administration.ApplicationPool' }
+          It "Should return the correct test Name" {
+            $results.Name | Should Be "AppPool property 'ToString()' for 'TestSite' Should be 'Microsoft.Web.Administration.ApplicationPool'"
+          }
+
+          It "Should return the correct test Expression" {
+            $results.Expression | Should Be "(Get-IISAppPool -Name 'TestSite' -ErrorAction SilentlyContinue).ToString() | Should be 'Microsoft.Web.Administration.ApplicationPool'"
+          }
+        }
+
         Context 'Firewall' {
             $results =    Firewall putty.exe Action { Should be 'Allow' }
 
@@ -567,10 +414,10 @@ Describe 'Test Functions' {
                 $results.Expression | Should Be "Get-NetFirewallRule -DisplayName 'putty.exe' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'Action' | Should be 'Allow'"
             }
         }
-        
-        
+
+
         Context 'SoftwareProduct' {
-            
+
             $results = SoftwareProduct 'Microsoft .NET Framework 4.6.1' { Should Exist }
 
             It "Should return the correct test Name" {
@@ -581,9 +428,9 @@ Describe 'Test Functions' {
                 $results.Expression | Should Be "@('HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*','HKLM:\\Software\Microsoft\Windows\CurrentVersion\Uninstall\*') | Where-Object { Test-Path $_ } | Get-ItemProperty | Where-Object DisplayName -Match 'Microsoft .NET Framework 4.6.1' | Should Exist"
             }
         }
-        
+
         Context 'SoftwareProduct w/Property' {
-            
+
             $results = SoftwareProduct 'Microsoft .NET Framework 4.6.1' DisplayVersion { Should Be 4.6.01055 }
 
             It "Should return the correct test Name" {
@@ -614,7 +461,7 @@ Describe 'Test Functions' {
 
             It "Should return the correct test Name" {
                 $results.Name | Should Be "AuditPolicy 'Security System Extension' Should Be 'Success'"
-            } 
+            }
             It "Should return the correct test Expression" {
                 $results.Expression | Should Be "GetAuditPolicy -Category 'System' -Subcategory 'Security System Extension' | Should Be 'Success'"
             }
@@ -626,9 +473,9 @@ Describe 'Test Functions' {
 
             It "Should return the correct test Name" {
                 $results.Name | Should Be "LocalUser property 'Disabled' for 'Guest' Should Be `$True"
-            } 
+            }
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "Get-CimInstance -ClassName Win32_UserAccount -filter `"LocalAccount=True AND Name='Guest'`" | Select-Object -ExpandProperty 'Disabled' | Should Be `$True"
+                $results.Expression | Should Be "Get-CimInstance -ClassName Win32_UserAccount -filter `"LocalAccount=True AND Name='Guest'`" | Select-Object -ExpandProperty 'Disabled' | Should Be $True"
             }
         }
 
@@ -638,7 +485,7 @@ Describe 'Test Functions' {
 
             It "Should return the correct test Name" {
                 $results.Name | Should Be "UserRightsAssignment 'SeNetworkLogonRight' Should Be @(`"BUILTIN\Users`",`"BUILTIN\Administrators`")"
-            } 
+            }
             It "Should return the correct test Expression" {
                 $results.Expression | Should Be "Get-AccountsWithUserRight -Right 'SeNetworkLogonRight' | Select-Object -ExpandProperty Account | Should Be @(`"BUILTIN\Users`",`"BUILTIN\Administrators`")"
             }
@@ -646,14 +493,14 @@ Describe 'Test Functions' {
 
         Context 'ServerFeature' {
 
-            $results = ServerFeature 'Telnet-Client' 'Installed' { Should Be $false }
+            $results = ServerFeature 'Telnet-Client' 'Installed' { Should Be $False }
 
             It "Should return the correct test Name" {
-                $results.Name | Should Be "ServerFeature property 'Installed' for 'Telnet-Client' Should Be `$false"
+                $results.Name | Should Be "ServerFeature property 'Installed' for 'Telnet-Client' Should Be `$False"
             }
 
             It "Should return the correct test Expression" {
-                $results.Expression | Should Be "GetFeature -Name Telnet-Client | Select-Object -ExpandProperty 'Installed' | Should be `$false"
+                $results.Expression | Should Be "GetFeature -Name Telnet-Client | Select-Object -ExpandProperty 'Installed' | Should be $False"
             }
         }
 

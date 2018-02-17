@@ -8,8 +8,8 @@
     in the default namespace or in the form of namespace/className to access other namespaces.
 .PARAMETER Property
     Specifies an instance property to retrieve.
-.PARAMETER Should 
-    A Script Block defining a Pester Assertion.  
+.PARAMETER Should
+    A Script Block defining a Pester Assertion.
 .EXAMPLE
     CimObject Win32_OperatingSystem SystemDirectory { Should Be C:\WINDOWS\system32 }
 .EXAMPLE
@@ -19,21 +19,22 @@
 #>
 function CimObject {
     [CmdletBinding()]
-    param(              
+    param(
         [Parameter(Mandatory, Position=1)]
         [Alias("ClassName")]
         [string]$Target,
-         
+
         [Parameter(Mandatory, Position=2)]
         [string]$Property,
-        
+
         [Parameter(Mandatory, Position=3)]
         [scriptblock]$Should
     )
-    
 
-    $expression = "Get-CimInstance"   
 
+    $expression = $null
+    $class = $null
+    $namespace = $null
     if ($Target -match '/')
     {
         $lastIndexOfSlash = $Target.LastIndexOf('/')
@@ -43,15 +44,25 @@ function CimObject {
 
         $PSBoundParameters["Target"] = $class
         $PSBoundParameters.Add("Qualifier", $namespace)
-        
+
         $expression = {Get-CimInstance -ClassName $Target -Namespace $Qualifier}
     }
-    else 
+    else
     {
         $expression = {Get-CimInstance -ClassName $Target}
     }
-        
-    $params = Get-PoshspecParam -TestName CimObject -TestExpression $expression @PSBoundParameters
-    
-    Invoke-PoshspecExpression @params 
+
+    if ($Property -like '*.*' -or $Property -like '*(*' -or $Property -like '*)*') {
+      $PSBoundParameters.Remove("Property")
+      $PSBoundParameters.Add("PropertyExpression", $Property)
+      $params = Get-PoshspecParam -TestName CimObject -TestExpression $expression @PSBoundParameters
+    }
+
+    else
+    {
+      $params = Get-PoshspecParam -TestName CimObject -TestExpression $expression @PSBoundParameters
+    }
+
+
+    Invoke-PoshspecExpression @params
 }
