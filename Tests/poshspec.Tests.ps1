@@ -271,6 +271,14 @@ Describe 'Get-PoshSpecADUser' {
 Describe 'Test Functions' {
     InModuleScope PoshSpec {
         Mock Invoke-PoshspecExpression {return $InputObject}
+        Mock Get-PoshSpecCCMHealth { 
+            $Result = [PSCustomObject]@{ 
+                Test = "CCM Agent health check";
+                Result = "Passed";
+                EvaluationTime = (Get-Date);
+            }    
+            return $Result     
+        }
         
         Context 'Service' {
          
@@ -648,6 +656,98 @@ Describe 'Test Functions' {
                 $results.Expression | Should Be "GetFeature -Name Telnet-Client | Select-Object -ExpandProperty 'Installed' | Should be `$false"
             }
         }
+
+        Context 'Bitlocker' {
+
+            $results = Bitlocker VolumeStatus { Should Be 'FullyEncrypted' }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "Bitlocker 'VolumeStatus' Should Be 'FullyEncrypted'"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-BitlockerVolume VolumeStatus | Select-Object -ExpandProperty  | Should Be 'FullyEncrypted'"
+            }
+        }
+
+        Context 'BranchCache' {
+
+            $results = BranchCache CurrentClientMode  { Should Be 'Enabled' }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "BranchCache 'CurrentClientMode' Should Be 'Enabled'"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-BCClientConfiguration | Select-Object -ExpandProperty CurrentClientMode | Should Be 'Enabled'"
+            }
+        }
+
+        Context 'MachinePolicy' {
+
+            $results = MachinePolicy 'VeryImportantGPO-1' { should not BeNullOrEmpty }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "GroupPolicy 'VeryImportantGPO-1' should not BeNullOrEmpty"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-CimInstance -ClassName RSOP_GPO -Namespace root/RSOP/Computer -Filter 'Name = `"VeryImportantGPO-1`" and Enabled = true and accessDenied = false`' | should not BeNullOrEmpty"
+            }
+        }
+
+        Context 'Driver' {
+
+            $results = Driver 'Audio Driver' DriverVersion { Should Be 13.0.1100.286  }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "Driver property 'DriverVersion' for 'Audio Driver' Should Be 13.0.1100.286"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-WmiObject Win32_PnPSignedDriver | Where-Object DeviceName -Like 'Audio Driver' | Select-Object -ExpandProperty 'DriverVersion' | Should Be 13.0.1100.286"
+            }
+        }
+
+        Context 'MalwareProtection' {
+
+            $results = MalwareProtection AntispywareEnabled { Should Be True }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "MalwareProtection 'AntispywareEnabled' Should Be True"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-MpComputerStatus | Select-Object -ExpandProperty AntispywareEnabled | Should Be True"
+            }
+        }
+
+        Context 'PSModule' {
+
+            $results = PSModule 'WorkplaceValidation' { Should Exist }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "PSModule 'WorkplaceValidation' Should Exist"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "Get-Module -Name WorkplaceValidation -ListAvailable -ErrorAction SilentlyContinue | Select-Object -First 1 | Select-Object -ExpandProperty 'Path' | should not benullorempty"
+            }
+        }
+
+        Context 'CCMHealthCheck' {
+
+            $results = CCMHealthCheck { Should Be 'Passed' }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be "has CCM Client Check 'CCM Agent health check' result 'Passed'"
+            }
+
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "'Passed' | Should Be 'Passed'"
+            }
+        }
+
     }
 }
 

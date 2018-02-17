@@ -25,7 +25,7 @@ function Bitlocker {
         [Alias("Path")]
         [string]$Target=($Env:SystemDrive),
 
-        [Parameter(Mandatory=$False, Position=1, ParameterSetName="Property")]
+        [Parameter(Mandatory=$False, Position=2, ParameterSetName="Property")]
         [ValidateSet(
             'AutoUnlockEnabled',
             'AutoUnlockKeyStored',
@@ -43,8 +43,8 @@ function Bitlocker {
         )]
         [string]$Property,
                 
-        [Parameter(Mandatory, Position=2, ParameterSetName="Property")]
-        [Parameter(Mandatory, Position=1, ParameterSetName="Default")]
+        [Parameter(Mandatory, Position=3, ParameterSetName="Property")]
+        [Parameter(Mandatory, Position=2, ParameterSetName="Default")]
         [scriptblock]$Should
     )
     Process {
