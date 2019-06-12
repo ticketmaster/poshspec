@@ -495,6 +495,18 @@ Describe 'Test Functions' {
                 $results.Expression | Should Be "GetFeature -Name Telnet-Client | Select-Object -ExpandProperty 'Installed' | Should be $False"
             }
         }
+
+        Context 'SecurityOption' {
+
+            $results = SecurityOption 'Accounts: Administrator account status' { Should Be 'Disabled' }
+
+            It "Should return the correct test Name" {
+                $results.Name | Should Be  "SecurityOption 'Accounts: Administrator account status' Should Be 'Disabled'"
+            }
+            It "Should return the correct test Expression" {
+                $results.Expression | Should Be "GetSecurityPolicy -Category 'Accounts_Administrator_account_status' | Should Be 'Disabled'"
+            }
+        }
     }
 }
 
