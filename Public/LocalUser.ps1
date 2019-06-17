@@ -8,9 +8,9 @@
 .PARAMETER Should 
     A Script Block defining a Pester Assertion.  
 .EXAMPLE
-    LocalGroup 'Guest' { should not BeNullOrEmpty }    
+    LocalUser 'Guest' { should not BeNullOrEmpty }    
 .EXAMPLE
-    LocalGroup 'Guest' Disabled { should Be $true }
+    LocalUser 'Guest' Disabled { should Be $true }
 .NOTES
     Assertions: Be, BeExactly, BeNullOrEmpty, Match, MatchExactly
 #>
