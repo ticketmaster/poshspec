@@ -3,12 +3,12 @@
 ## [2.2.7] - 2019-06-13
 
 ### Added
-* Added `SecurityOption` function for validating Local Security Policy Security Option settings -- Thanks @markwragg
+* Added `SecurityOption` function for validating Local Security Policy Security Option settings -- Thanks [@markwragg](https://github.com/markwragg)
 
 ## [2.2.2] - 2018-06-22
 
 ### Fixed
-* [BugFix] Loading of Pester module moved to the `RequiredModules` field of the Manifest as loading it via `Import-Module` was causing PowerShell Gallery to think the Pester cmdlets were part of this module, which caused issues installing PoshSpec unless `-NoClobber` was used. - Thanks @AspenForester
+* [BugFix] Loading of Pester module moved to the `RequiredModules` field of the Manifest as loading it via `Import-Module` was causing PowerShell Gallery to think the Pester cmdlets were part of this module, which caused issues installing PoshSpec unless `-NoClobber` was used. - Thanks [@AspenForester](https://github.com/AspenForester)
 
 ## [2.2.1] - 2017-05-13
 
@@ -44,7 +44,7 @@ See [#52](https://github.com/Ticketmaster/poshspec/pull/52) for details. Thanks 
 ## [2.1.10] - 2016-07-05
 
 ### Changed
-* Added `-UseBasicParsing` switch to Http test function so that it works on a headless deployment (no Internet Explorer) - Thanks @Sam-Martin
+* Added `-UseBasicParsing` switch to Http test function so that it works on a headless deployment (no Internet Explorer) - Thanks [@Sam-Martin](https://github.com/Sam-Martin)
 
 ## [2.1.6] - 2016-05-27
 
