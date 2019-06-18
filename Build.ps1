@@ -69,7 +69,7 @@ Properties {
     $ModuleName = $ManifestPath.BaseName
 
     # Path to the release notes file.  Set to $null if the release notes reside in the manifest file.
-    $ReleaseNotesPath = "$PSScriptRoot\ReleaseNotes.md"
+    $ReleaseNotesPath = "$PSScriptRoot\CHANGELOG.md"
 
     # The directory used to publish the module from.  If you are using Git, the
     # $PublishDir should be ignored if it is under the workspace directory.
