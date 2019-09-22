@@ -36,7 +36,7 @@ function SoftwareProduct {
         [scriptblock]$Should
     )
     
-    $expression = {@('HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*','HKLM:\\Software\Microsoft\Windows\CurrentVersion\Uninstall\*') | Where-Object { Test-Path $_ } | Get-ItemProperty | Where-Object DisplayName -Match '$Target'}
+    $expression = {@('HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*','HKLM:\\Software\Microsoft\Windows\CurrentVersion\Uninstall\*') | Where-Object { Test-Path `$_ } | Get-ItemProperty | Where-Object DisplayName -Match '$Target'}
     
     $params = Get-PoshspecParam -TestName SoftwareProduct -TestExpression $expression @PSBoundParameters
     
