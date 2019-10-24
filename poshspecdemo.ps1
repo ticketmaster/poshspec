@@ -47,3 +47,7 @@ Describe 'Volume' {
     Volume 'ShouldNotExist' { Should -BeNullOrEmpty }
 }
 
+Describe 'Sql' {
+    Sql "server60" "Integrated Security=SSPI;Persist Security Info=False;Initial Catalog=ReportingDB;Data Source=server60" Database { Should Be "ReportingDB" }
+    Sql "server60" "Integrated Security=SSPI;Persist Security Info=False;Initial Catalog=ReportingDB;Data Source=server60" State { Should Match "Closed" }
+}
